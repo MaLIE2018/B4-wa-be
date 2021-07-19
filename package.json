@@ -22,6 +22,7 @@
   "dependencies": {
     "@types/atob": "^2.1.2",
     "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.12",
     "@types/http-errors": "^1.8.1",
     "@types/jsonwebtoken": "^8.5.4",
     "@types/mongoose": "^5.11.97",
