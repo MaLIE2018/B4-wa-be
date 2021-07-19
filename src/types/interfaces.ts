@@ -5,3 +5,8 @@ export type Middleware = (
   res: Response,
   next: NextFunction
 ) => void;
+
+
+export interface User {
+  
+}
