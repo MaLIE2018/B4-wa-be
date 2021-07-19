@@ -2,7 +2,7 @@ import server from "./app";
 import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
 import ChatModel from "./services/chat/chatSchema";
-import { Message } from "./types/interfaces";
+import { ChatList, Message } from "./types/interfaces";
 
 const io = new Server(server, {
   cors: {
@@ -17,20 +17,25 @@ const io = new Server(server, {
 io.on("connect", (socket) => {
   console.log(socket.id);
 
-  socket.on("joinRooms", async (rooms: string[]) => {
-    rooms.forEach((room) => socket.join(room));
+  socket.on("connect", async (userId, rooms: ChatList[]) => {
+    await UserModel.findByIdAndUpdate(
+      userId,
+      { online: true },
+      { useFindAndModify: false }
+    );
+    rooms.forEach((room) => {
+      if (!room.hidden) socket.join(room.chatId);
+    });
   });
-
-  socket.on("connect", async (userId) => {
-    await UserModel.findOneAndUpdate({ _id: userId }, { online: true });
-  });
+  //Can I use nested Socket calls?
 
   socket.on("sendMessage", async (message: Message, chatId) => {
-    await ChatModel.findOneAndUpdate(
+    await ChatModel.findByIdAndUpdate(
       { _id: chatId },
       {
         $push: { messages: message },
-      }
+      },
+      { useFindAndModify: false }
     );
     socket.to(chatId).emit("message", message);
   });

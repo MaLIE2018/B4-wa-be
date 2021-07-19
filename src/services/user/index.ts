@@ -1,6 +1,6 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import createError from "http-errors";
-import { basicAuthMiddleware } from "../../lib/auth/auth";
+import { basicAuthMiddleware, JWTMiddleWare } from "../../lib/auth/auth";
 import UserModel from "./userSchema";
 import { JWTAuthenticate } from "../../lib/auth/tools";
 
@@ -16,19 +16,23 @@ userRouter.post("/register", async (req, res, next) => {
   }
 });
 
-userRouter.get("/login", basicAuthMiddleware, async (req: any, res, next) => {
-  try {
-    if (req.user) {
-      const { accessToken, refreshToken } = await JWTAuthenticate(req.user);
-      res.cookie("access_token", accessToken, { httpOnly: true }); //sameSite: none, secure:true
-      res.cookie("refresh_token", refreshToken, { httpOnly: true });
-      res.status(200).send();
+userRouter.get(
+  "/login",
+  basicAuthMiddleware,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.user) {
+        const { accessToken, refreshToken } = await JWTAuthenticate(req.user);
+        res.cookie("access_token", accessToken, { httpOnly: true }); //sameSite: none, secure:true
+        res.cookie("refresh_token", refreshToken, { httpOnly: true });
+        res.status(200).send(req.user);
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
     }
-  } catch (error) {
-    console.log(error);
-    next(error);
   }
-});
+);
 
 userRouter.get(
   "/logout",

@@ -19,6 +19,7 @@ export interface User {
   status?: boolean;
   lastSeen?: string;
   friends?: User[];
+  chats: [{ hidden: boolean; chatId: string }];
   refreshToken?: string;
   save: Function;
 }
@@ -26,12 +27,17 @@ export interface User {
 export interface Message {
   text: string;
   userId: string;
-  hidden: string[];
+  hidden?: string[];
   content?: string[];
 }
 
 export interface Chat {
-  ownerId: string;
   participants: string[];
   messages: Message[];
+  name: string;
+}
+
+export interface ChatList {
+  hidden: boolean;
+  chatId: string;
 }
