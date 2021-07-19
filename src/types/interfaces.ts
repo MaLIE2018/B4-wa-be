@@ -6,17 +6,17 @@ export type Middleware = (
   next: NextFunction
 ) => void;
 
-
 export interface User {
-	firstName: string;
-	lastName: string;
-	email: string;
-	password?: string;
-	avatar?: string;
-	username?: string;
-	status?: string;
-	lastSeen?: string;
-	friends?: User[]
+  profile: {
+    username?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    avatar?: string;
+  };
+  password?: string;
+  status?: string;
+  lastSeen?: string;
+  friends?: User[];
   refreshToken?: string;
-  socketId?:string
 }
