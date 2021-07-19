@@ -7,6 +7,7 @@ export type Middleware = (
 ) => void;
 
 export interface User {
+  _id?: string;
   profile: {
     username?: string;
     firstName: string;
@@ -15,8 +16,22 @@ export interface User {
     avatar?: string;
   };
   password?: string;
-  status?: string;
+  status?: boolean;
   lastSeen?: string;
   friends?: User[];
   refreshToken?: string;
+  save: Function;
+}
+
+export interface Message {
+  text: string;
+  userId: string;
+  hidden: string[];
+  content?: string[];
+}
+
+export interface Chat {
+  ownerId: string;
+  participants: string[];
+  messages: Message[];
 }

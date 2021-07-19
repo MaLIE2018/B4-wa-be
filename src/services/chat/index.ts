@@ -7,12 +7,25 @@ chatRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
   console.log("test");
   res.status(200).send();
 });
+chatRouter.post(
+  "/",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+    } catch (error) {
+      next(error);
+    }
+    res.status(200).send();
+  }
+);
 
 //Get Chat by ID
 chatRouter.get(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("test");
+    try {
+    } catch (error) {
+      next(error);
+    }
     res.status(200).send();
   }
 );
@@ -21,7 +34,10 @@ chatRouter.get(
 chatRouter.delete(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("test");
+    try {
+    } catch (error) {
+      next(error);
+    }
     res.status(200).send();
   }
 );
@@ -30,7 +46,10 @@ chatRouter.delete(
 chatRouter.post(
   "/:id/participants",
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("test");
+    try {
+    } catch (error) {
+      next(error);
+    }
     res.status(200).send();
   }
 );
@@ -38,7 +57,10 @@ chatRouter.post(
 chatRouter.delete(
   "/:id/participants/:id",
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("test");
+    try {
+    } catch (error) {
+      next(error);
+    }
     res.status(200).send();
   }
 );

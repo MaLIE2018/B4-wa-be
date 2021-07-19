@@ -1,4 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { User } from "../../types/interfaces";
 
 const generateAccessToken = (payload: {}) =>
   new Promise<string>((resolve, reject) =>
@@ -28,15 +29,15 @@ const generateRefreshToken = (payload: {}) =>
     )
   );
 
-// export const JWTAuthenticate = async (user: User) => {
-//   const accessToken = await generateAccessToken({ _id: user._id });
-//   const refreshToken = await generateRefreshToken({ _id: user._id });
+export const JWTAuthenticate = async (user: User) => {
+  const accessToken = await generateAccessToken({ _id: user._id });
+  const refreshToken = await generateRefreshToken({ _id: user._id });
 
-//   user.refreshToken = refreshToken;
+  user.refreshToken = refreshToken;
 
-//   await user.save();
-//   return { accessToken, refreshToken };
-// };
+  await user.save();
+  return { accessToken, refreshToken };
+};
 
 export const verifyRefreshToken = (refreshToken: string) =>
   new Promise((resolve, reject) =>
