@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import errorHandlers from "./lib/errorhandler";
 import { createServer } from "http";
+import route from "./services";
 
 const app = express();
 
@@ -14,8 +15,7 @@ app.use(cookieParser());
 
 const server = createServer(app);
 
-// app.use("/accommodation", destinationRouter, accommodationRouter);
-// app.use("/users", userRouter);
+app.use("/", route);
 app.use(errorHandlers);
 
 export default server;
