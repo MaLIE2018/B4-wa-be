@@ -15,8 +15,6 @@ const io = new Server(server, {
 });
 
 io.on("connect", (socket) => {
-  console.log(socket.id);
-
   socket.on("connect", async (userId, rooms: ChatList[]) => {
     await UserModel.findByIdAndUpdate(
       userId,
@@ -39,6 +37,7 @@ io.on("connect", (socket) => {
     );
     socket.to(chatId).emit("message", message);
   });
+
   socket.on("disconnect", async (userId) => {
     await UserModel.findOneAndUpdate({ _id: userId }, { online: false });
   });
