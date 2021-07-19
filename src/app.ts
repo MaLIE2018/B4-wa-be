@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import errorHandlers from "./lib/errorhandler";
 import { createServer } from "http";
 import route from "./services";
+import UserRouter from "./services/user";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 const server = createServer(app);
 
 app.use("/", route);
+app.use("/", UserRouter);
 app.use(errorHandlers);
 
 export default server;

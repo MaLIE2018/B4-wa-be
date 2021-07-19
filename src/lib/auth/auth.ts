@@ -1,8 +1,9 @@
 // import UserModel from "../../DB/users/user";
-// import createError from "http-errors";
+import UserModel from '../../services/user/userSchema'
+import createError from "http-errors";
 // import { verifyAccessToken } from "./tools";
 // import atob from "atob";
-// import { Middleware } from "../../types/interfaces";
+import { Middleware } from "../../types/interfaces";
 
 // export const JWTMiddleWare: Middleware = async (req, res, next) => {
 //   if (!req.cookies.access_token) {
@@ -25,20 +26,20 @@
 //   }
 // };
 
-// export const basicAuthMiddleware: Middleware = async (req, res, next) => {
-//   if (!req.headers.authorization) {
-//     next(createError(401, { message: "Authorization required" }));
-//   } else {
-//     const decoded = atob(req.headers.authorization.split(" ")[1]);
-//     const [email, password] = decoded.split(":");
+export const basicAuthMiddleware: Middleware = async (req, res, next) => {
+  if (!req.headers.authorization) {
+    next(createError(401, { message: "Authorization required" }));
+  } else {
+    const decoded = atob(req.headers.authorization.split(" ")[1]);
+    const [email, password] = decoded.split(":");
 
-//     const user = await UserModel.checkCredentials(email, password);
+    const user = await UserModel.checkCredentials(email, password);
 
-//     if (user) {
-//       req.user = user;
-//       next();
-//     } else {
-//       next(createError(401, { message: "Credentials wrong" }));
-//     }
-//   }
-// };
+    if (user) {
+      req.user = user;
+      next();
+    } else {
+      next(createError(401, { message: "Credentials wrong" }));
+    }
+  }
+};
