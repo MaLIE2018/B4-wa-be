@@ -8,5 +8,15 @@ export type Middleware = (
 
 
 export interface User {
-  
+	firstName: string;
+	lastName: string;
+	email: string;
+	password?: string;
+	avatar?: string;
+	username?: string;
+	status?: string;
+	lastSeen?: string;
+	friends?: User[]
+  refreshToken?: string;
+  socketId?:string
 }
