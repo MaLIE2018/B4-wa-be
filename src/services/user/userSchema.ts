@@ -1,4 +1,5 @@
-import mongoose, {Model} from 'mongoose'
+import mongoose, { Model } from 'mongoose'
+import { User } from '../../types/interfaces';
 
 const { model, Schema } = mongoose
 
@@ -16,7 +17,8 @@ const UserSchema = new Schema<User, UserModel>({
 	status: { type: String, default: "offline", enum: ["online", "offline"] },
 	lastSeen:{type:Date},
 	friends: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
-	refreshToken:{type:String}
+	refreshToken: { type: String },
+	socketId:{type:String},
 }, { timestamps: true });
 
 UserSchema.methods.toJSON = function () {
