@@ -1,5 +1,6 @@
 import mongoose, { Model } from "mongoose";
 import { User } from "../../types/interfaces";
+import bcrypt from "bcrypt";
 
 const { model, Schema } = mongoose;
 
@@ -13,11 +14,11 @@ const UserSchema = new Schema<User, UserModel>(
       username: { type: String },
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
-      email: { type: String, required: true },
+      email: { type: String, required: true, unique: true },
       avatar: { type: String, default: "https://source.unsplash.com/random" },
     },
     password: { type: String },
-    status: { type: String, default: "offline", enum: ["online", "offline"] },
+    online: { type: Boolean, default: false },
     lastSeen: { type: Date },
     friends: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
     refreshToken: { type: String },
@@ -35,13 +36,32 @@ UserSchema.methods.toJSON = function () {
   const user = this;
   const userObj = user.toObject();
   delete userObj.refreshToken;
+  delete userObj.password;
+  delete userObj.__v;
 
   return userObj;
 };
 
+UserSchema.pre("save", async function () {
+  const newUser = this;
+  if (newUser.isModified("password")) {
+    newUser.password = await bcrypt.hash(newUser.password!, 10);
+  }
+});
+
 UserSchema.static(
   "checkCredentials",
-  async function checkCredentials(email, password) {}
+  async function checkCredentials(email, password) {
+    const user = await this.findOne({ "profile.email": email });
+    if (user) {
+      const isMatch = await bcrypt.compare(password, user.password!);
+
+      if (isMatch) return user;
+      else return null;
+    } else {
+      return null;
+    }
+  }
 );
 
 export default model("User", UserSchema);
