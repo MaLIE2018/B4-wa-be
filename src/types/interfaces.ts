@@ -6,17 +6,32 @@ export type Middleware = (
   next: NextFunction
 ) => void;
 
-
 export interface User {
-	firstName: string;
-	lastName: string;
-	email: string;
-	password?: string;
-	avatar?: string;
-	username?: string;
-	status?: string;
-	lastSeen?: string;
-	friends?: User[]
+  _id?: string;
+  profile: {
+    username?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    avatar?: string;
+  };
+  password?: string;
+  status?: boolean;
+  lastSeen?: string;
+  friends?: User[];
   refreshToken?: string;
-  socketId?:string
+  save: Function;
+}
+
+export interface Message {
+  text: string;
+  userId: string;
+  hidden: string[];
+  content?: string[];
+}
+
+export interface Chat {
+  ownerId: string;
+  participants: string[];
+  messages: Message[];
 }

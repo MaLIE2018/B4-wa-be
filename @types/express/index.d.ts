@@ -1,4 +1,4 @@
-import UserModel from "../../src/DB/users";
+import UserModel from "../../src/services/user/userSchema";
 
 declare module "express-serve-static-core" {
   interface Request {

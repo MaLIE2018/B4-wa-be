@@ -1,36 +1,58 @@
-import express, { Request, Response, NextFunction } from 'express'
-import createError from 'http-errors'
-import UserModel from './userSchema'
+import express, {Request, Response, NextFunction} from "express";
+import createError from "http-errors";
+import {basicAuthMiddleware, JWTMiddleWare} from "../../lib/auth/auth";
+import UserModel from "./userSchema";
+import {JWTAuthenticate} from "../../lib/auth/tools";
 
-const UserRouter = express.Router()
+const userRouter = express.Router();
 
-UserRouter.post(
-	"/register",
+userRouter.post("/register", async (req, res, next) => {
+	try {
+		const newUser = new UserModel(req.body);
+		await newUser.save();
+		res.status(201).send(newUser);
+	} catch (error) {
+		next(createError(500, {message: error.message}));
+	}
+});
+
+userRouter.get("/login", basicAuthMiddleware, async (req: any, res, next) => {
+	try {
+		if (req.user) {
+			const {accessToken, refreshToken} = await JWTAuthenticate(req.user);
+			res.cookie("access_token", accessToken, {httpOnly: true}); //sameSite: none, secure:true
+			res.cookie("refresh_token", refreshToken, {httpOnly: true});
+			res.status(200).send();
+		}
+	} catch (error) {
+		console.log(error);
+		next(error);
+	}
+});
+
+userRouter.get(
+	"/logout",
+	JWTMiddleWare,
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const request = await new UserModel(req.body).save();
-			res.send(request._id);
-		} catch (error: any) {
-			if (error.errors) res.send(error.errors);
-			else next(createError(400, "Bad Request!"));
+			if (req.user) {
+				res.clearCookie("access_token");
+				res.clearCookie("refresh_token");
+				res.status(200).send();
+			}
+		} catch (error) {
+			console.log(error);
+			next(error);
 		}
 	}
 );
 
-UserRouter.get(
-	"/login",
-	async (req: Request, res: Response, next: NextFunction) => {
-		try {
-			const request = await new UserModel(req.body).save();
-			res.send(request._id);
-		} catch (error: any) {
-			if (error.errors) res.send(error.errors);
-			else next(createError(400, "Bad Request!"));
-		}
-	}
-);
+export default userRouter;
 
-export default UserRouter
+// every route with Authentication
+//logout
 
-// token with cookies not with body
-//login basicAuth in auth/auth.ts
+//add friend to friendList //delete friends
+//get all my friends.profiles
+
+//put profile
