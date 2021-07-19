@@ -12,6 +12,7 @@ mongoose
   .connect(process.env.MDB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
   .then(() => {
     console.log("mongoose connected");
