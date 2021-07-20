@@ -8,7 +8,7 @@ const chatRouter = express.Router();
 chatRouter.get("/me", async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.user._id).populate({
-      path: "chats.chatId",
+      path: "chats.chat",
       populate: {
         path: "participants",
         select: "profile",
