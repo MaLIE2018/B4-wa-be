@@ -34,6 +34,7 @@ var forbidden = function (err, req, res, next) {
 };
 var catchAll = function (err, req, res, next) {
     if (err) {
+        console.log(err);
         res.status(500).send("Generic Server Error");
     }
     next();
