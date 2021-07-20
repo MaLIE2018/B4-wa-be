@@ -10,8 +10,8 @@ if (
 ) {
   GoogleStrategy = new Strategy(
     {
-      clientID: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
+      clientID: process.env.GOOGLE_ID!,
+      clientSecret: process.env.GOOGLE_SECRET!,
       callbackURL: process.env.FE_URL + "/users/googleRedirect",
     },
     async (
