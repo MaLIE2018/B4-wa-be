@@ -2,11 +2,13 @@ import passport from "passport";
 import UserModel from "../../services/user/userSchema";
 import { JWTAuthenticate } from "./tools";
 
-let GoogleStrategy = require("passport-google-oauth20").Strategy;
-
-passport.use(
-  "google",
-  new GoogleStrategy(
+import { Strategy } from "passport-google-oauth20";
+let GoogleStrategy;
+if (
+  process.env.GOOGLE_ID !== undefined &&
+  process.env.GOOGLE_SECRET !== undefined
+) {
+  GoogleStrategy = new Strategy(
     {
       clientID: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
@@ -43,8 +45,9 @@ passport.use(
         passportNext(error);
       }
     }
-  )
-);
+  );
+  passport.use("google", GoogleStrategy);
+}
 
 passport.serializeUser(function (user, passportNext) {
   // this is for req.user
