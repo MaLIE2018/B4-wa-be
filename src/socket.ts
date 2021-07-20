@@ -26,7 +26,13 @@ io.on("connect", (socket) => {
     });
     socket.emit("loggedIn");
   });
-  //Can I use nested Socket calls?
+
+  socket.on("newChat", async (chatId) => {
+    socket.join(chatId);
+  });
+  socket.on("leaveChat", async (chatId) => {
+    socket.leave(chatId);
+  });
 
   socket.on("sendMessage", async (message: Message, chatId) => {
     await ChatModel.findByIdAndUpdate(
@@ -37,10 +43,6 @@ io.on("connect", (socket) => {
       { useFindAndModify: false }
     );
     socket.to(chatId).emit("message", message);
-  });
-
-  socket.on("leaveChat", async (chatId) => {
-    socket.leave(chatId);
   });
 
   socket.on("disconnect", async (userId) => {

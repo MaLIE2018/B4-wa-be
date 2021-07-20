@@ -23,7 +23,10 @@ chatRouter.post("/", async (req, res, next) => {
       participants: req.body.participants,
     });
     if (matchIt.length === 0) {
-      const chat = new ChatModel(req.body);
+      const chat = new ChatModel({
+        ...req.body,
+        participants: [new Set(...req.body.participants, req.user._id)],
+      });
       await chat.save();
       await Promise.all(
         chat.participants.map(

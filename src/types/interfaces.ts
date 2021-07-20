@@ -20,7 +20,7 @@ export interface User {
   status?: boolean;
   lastSeen?: string;
   friends?: User[];
-  chats: [{ hidden: boolean; chatId: string }];
+  chats: { hidden: boolean; chatId: string }[];
   refreshToken?: string;
   save: Function;
 }
