@@ -14,6 +14,7 @@ export interface User {
     lastName: string;
     email: string;
     avatar?: string;
+    googleId?: string;
   };
   password?: string;
   status?: boolean;
