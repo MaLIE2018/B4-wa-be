@@ -16,13 +16,13 @@ const passport_1 = __importDefault(require("passport"));
 const userSchema_1 = __importDefault(require("../../services/user/userSchema"));
 const tools_1 = require("./tools");
 const passport_google_oauth20_1 = require("passport-google-oauth20");
-let GoogleStrategy;
+let GoogleStrat;
 if (process.env.GOOGLE_ID !== undefined &&
     process.env.GOOGLE_SECRET !== undefined) {
-    GoogleStrategy = new passport_google_oauth20_1.Strategy({
+    GoogleStrat = new passport_google_oauth20_1.Strategy({
         clientID: process.env.GOOGLE_ID,
         clientSecret: process.env.GOOGLE_SECRET,
-        callbackURL: process.env.FE_URL + "/users/googleRedirect",
+        callbackURL: "/users/googleRedirect",
     }, (accessToken, refreshToken, profile, passportNext) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             console.log("profile:", profile);
@@ -50,7 +50,7 @@ if (process.env.GOOGLE_ID !== undefined &&
             passportNext(error);
         }
     }));
-    passport_1.default.use("google", GoogleStrategy);
+    passport_1.default.use("google", GoogleStrat);
 }
 passport_1.default.serializeUser(function (user, passportNext) {
     // this is for req.user
