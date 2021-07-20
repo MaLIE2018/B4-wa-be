@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
 const socket_io_1 = require("socket.io");
 const userSchema_1 = __importDefault(require("./services/user/userSchema"));
+const messageSchema_1 = __importDefault(require("./services/message/messageSchema"));
 const chatSchema_1 = __importDefault(require("./services/chat/chatSchema"));
 const io = new socket_io_1.Server(app_1.default, {
     cors: {
@@ -25,24 +26,30 @@ const io = new socket_io_1.Server(app_1.default, {
     },
     allowEIO3: true,
 });
-io.on("connect", (socket) => {
+io.on("connection", (socket) => {
     socket.on("connect", (userId, chats) => __awaiter(void 0, void 0, void 0, function* () {
         yield userSchema_1.default.findByIdAndUpdate(userId, { online: true }, { useFindAndModify: false });
         chats.forEach((chat) => {
-            if (!chat.hidden)
-                socket.join(chat.chatId);
+            socket.join(chat.chat);
         });
         socket.emit("loggedIn");
     }));
-    //Can I use nested Socket calls?
-    socket.on("sendMessage", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
-        yield chatSchema_1.default.findByIdAndUpdate({ _id: chatId }, {
-            $push: { messages: message },
-        }, { useFindAndModify: false });
-        socket.to(chatId).emit("message", message);
+    socket.on("joinRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
+        socket.join(chatId);
+        console.log("Rooms", socket.rooms);
     }));
-    socket.on("leaveChat", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on("leaveRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.leave(chatId);
+        console.log("newChat", socket.rooms);
+    }));
+    socket.on("sendMessage", (message) => __awaiter(void 0, void 0, void 0, function* () {
+        const nm = new messageSchema_1.default(message);
+        yield nm.save();
+        yield chatSchema_1.default.findByIdAndUpdate(message.chatId, {
+            latestMessage: nm,
+        });
+        socket.to(message.chatId).emit("message", "test");
+        socket.emit("message", message.text);
     }));
     socket.on("disconnect", (userId) => __awaiter(void 0, void 0, void 0, function* () {
         yield userSchema_1.default.findOneAndUpdate({ _id: userId }, { online: false });
