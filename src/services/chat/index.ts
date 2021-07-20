@@ -7,9 +7,18 @@ const chatRouter = express.Router();
 //Get all my Chats
 chatRouter.get("/me", async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.user._id);
+    const user = await UserModel.findById(req.user._id).populate({
+      path: "chats.chatId",
+      populate: {
+        path: "participants",
+        select: "profile",
+      },
+    });
+
+    //select: { messages: { $slice: ["$messages", -1] } },
+
     if (user !== null) {
-      res.status(200).send(user.chats.filter((c) => c.hidden === false));
+      res.status(200).send(user.chats);
     } else {
       next();
     }
@@ -17,15 +26,16 @@ chatRouter.get("/me", async (req, res, next) => {
     next(error);
   }
 });
+
 chatRouter.post("/", async (req, res, next) => {
   try {
-    const matchIt = await ChatModel.find({
-      participants: req.body.participants,
+    const matchIt = await ChatModel.findOne({
+      participants: [...req.body.participants, req.user._id],
     });
-    if (matchIt.length === 0) {
+    if (matchIt === null) {
       const chat = new ChatModel({
         ...req.body,
-        participants: [new Set(...req.body.participants, req.user._id)],
+        participants: [...req.body.participants, req.user._id],
       });
       await chat.save();
       await Promise.all(
@@ -34,7 +44,7 @@ chatRouter.post("/", async (req, res, next) => {
             await UserModel.findByIdAndUpdate(
               participantId,
               {
-                $push: { chats: { chatId: chat._id } },
+                $push: { chats: { chat: chat._id } },
               },
               { useFindAndModify: false }
             )
@@ -67,7 +77,7 @@ chatRouter.get("/:id", async (req, res, next) => {
 chatRouter.delete("/:id", async (req, res, next) => {
   try {
     req.user.chats = req.user.chats.map((c: ChatList) => {
-      if (c.chatId.toString() === req.params.id.toString()) {
+      if (c.chat.toString() === req.params.id.toString()) {
         c.hidden = true;
         return c;
       }
