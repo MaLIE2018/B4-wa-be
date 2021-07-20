@@ -1,9 +1,9 @@
 import server from "./app";
 import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
+import MessageModel from "./services/message/messageSchema";
+import { ChatList, Message } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
-import { ChatList, extendedMessage, Message } from "./types/interfaces";
-import { isSemicolonClassElement } from "typescript";
 
 const io = new Server(server, {
   cors: {
@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
       { useFindAndModify: false }
     );
     chats.forEach((chat) => {
-      socket.join(chat.chatId);
+      socket.join(chat.chat);
     });
     socket.emit("loggedIn");
   });
@@ -38,14 +38,12 @@ io.on("connection", (socket) => {
     console.log("newChat", socket.rooms);
   });
 
-  socket.on("sendMessage", async (message: extendedMessage) => {
-    await ChatModel.findByIdAndUpdate(
-      message.chatId,
-      {
-        $push: { messages: message },
-      },
-      { useFindAndModify: false }
-    );
+  socket.on("sendMessage", async (message: Message) => {
+    const nm = new MessageModel(message);
+    await nm.save();
+    await ChatModel.findByIdAndUpdate(message.chatId, {
+      latestMessage: nm,
+    });
     socket.to(message.chatId).emit("message", "test");
     socket.emit("message", message.text);
   });

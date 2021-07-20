@@ -10,7 +10,7 @@ interface UserModel extends Model<User> {
 
 const ChatsReferenceSchema = new Schema(
   {
-    chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
+    chat: { type: Schema.Types.ObjectId, ref: "Chat" },
     hidden: { type: Boolean, default: false },
   },
   { _id: false }

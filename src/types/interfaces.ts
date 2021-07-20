@@ -41,18 +41,16 @@ export interface Message {
   userId: string;
   hidden?: string[];
   content?: string[];
-}
-export interface extendedMessage extends Message {
   chatId: string;
 }
 
 export interface Chat {
   participants: string[];
-  messages: Message[];
+  messages: [];
   name: string;
 }
 
 export interface ChatList {
   hidden: boolean;
-  chatId: string;
+  chat: string;
 }
