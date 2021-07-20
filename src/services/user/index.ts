@@ -124,7 +124,7 @@ userRouter.get(
         const { accessToken, refreshToken } = await JWTAuthenticate(req.user);
         res.cookie("access_token", accessToken, { httpOnly: true }); //sameSite: none, secure:true
         res.cookie("refresh_token", refreshToken, { httpOnly: true });
-        res.status(200).send("Welcome");
+        res.status(200).send(req.user);
       }
     } catch (error) {
       console.log(error);

@@ -55,12 +55,22 @@ UserSchema.pre("save", async function () {
 UserSchema.static(
   "checkCredentials",
   async function checkCredentials(email, password) {
-    const user = await this.findOne({ "profile.email": email });
+    const user = await this.findOne({ "profile.email": email }).populate(
+      "friends",
+      {
+        profile: 1,
+      }
+    );
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password!);
 
-      if (isMatch) return user;
-      else return null;
+      if (isMatch) {
+        user.chats = user.chats.filter((c) => c.hidden === false);
+        await user.save();
+        return user;
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
