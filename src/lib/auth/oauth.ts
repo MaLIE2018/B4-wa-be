@@ -3,23 +3,19 @@ import UserModel from "../../services/user/userSchema";
 import { JWTAuthenticate } from "./tools";
 
 import { Strategy } from "passport-google-oauth20";
-let GoogleStrategy;
+
+let GoogleStrat;
 if (
   process.env.GOOGLE_ID !== undefined &&
   process.env.GOOGLE_SECRET !== undefined
 ) {
-  GoogleStrategy = new Strategy(
+  GoogleStrat = new Strategy(
     {
-      clientID: process.env.GOOGLE_ID!,
-      clientSecret: process.env.GOOGLE_SECRET!,
-      callbackURL: process.env.FE_URL + "/users/googleRedirect",
+      clientID: process.env.GOOGLE_ID as string,
+      clientSecret: process.env.GOOGLE_SECRET as string,
+      callbackURL: "/users/googleRedirect",
     },
-    async (
-      accessToken: any,
-      refreshToken: any,
-      profile: any,
-      passportNext: any
-    ) => {
+    async (accessToken, refreshToken, profile: any, passportNext) => {
       try {
         console.log("profile:", profile);
         const user = await UserModel.findOne({ googleId: profile.id });
@@ -46,7 +42,7 @@ if (
       }
     }
   );
-  passport.use("google", GoogleStrategy);
+  passport.use("google", GoogleStrat);
 }
 
 passport.serializeUser(function (user, passportNext) {
