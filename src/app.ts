@@ -7,7 +7,7 @@ import routes from "./services";
 
 const app = express();
 
-const corsOptions = { origin: "http://localhost:3000", credentials: true };
+const corsOptions = { origin: process.env.FE_URL, credentials: true };
 
 app.use(cors(corsOptions));
 app.use(express.json());
