@@ -51,6 +51,39 @@ userRouter.get(
   }
 );
 
+userRouter.get(
+  "/me/friends",
+  JWTMiddleWare,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.status(200).send(req.user.friends);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
+
+userRouter.post(
+  "/me/friends/:userId",
+  JWTMiddleWare,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const friend = await UserModel.findById(req.params.userId);
+      if (friend) {
+        req.user.friends.push(req.params.userId);
+        await req.user.save();
+        res.status(200).send();
+      } else {
+        next(createError(404, { message: "User not found." }));
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
+
 export default userRouter;
 
 // every route with Authentication

@@ -24,6 +24,17 @@ export interface User {
   save: Function;
 }
 
+export interface TestUser {
+  profile: {
+    username?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    avatar?: string;
+  };
+  password?: string;
+}
+
 export interface Message {
   text: string;
   userId: string;
