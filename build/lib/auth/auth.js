@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+<<<<<<< HEAD
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -35,11 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+=======
+>>>>>>> developement
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.basicAuthMiddleware = exports.JWTMiddleWare = void 0;
+<<<<<<< HEAD
 var userSchema_1 = __importDefault(require("../../services/user/userSchema"));
 var http_errors_1 = __importDefault(require("http-errors"));
 var tools_1 = require("./tools");
@@ -103,4 +107,49 @@ var basicAuthMiddleware = function (req, res, next) { return __awaiter(void 0, v
         }
     });
 }); };
+=======
+const userSchema_1 = __importDefault(require("../../services/user/userSchema"));
+const http_errors_1 = __importDefault(require("http-errors"));
+const tools_1 = require("./tools");
+const atob_1 = __importDefault(require("atob"));
+const JWTMiddleWare = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.cookies.access_token) {
+        next(http_errors_1.default(401, { message: "Provide Access Token" }));
+    }
+    else {
+        try {
+            const content = yield tools_1.verifyAccessToken(req.cookies.access_token);
+            const user = yield userSchema_1.default.findById(content._id);
+            if (user) {
+                req.user = user;
+                next();
+            }
+            else {
+                next(http_errors_1.default(404, { message: "User not found" }));
+            }
+        }
+        catch (error) {
+            next(http_errors_1.default(401, { message: "AccessToken not valid" }));
+        }
+    }
+});
+exports.JWTMiddleWare = JWTMiddleWare;
+const basicAuthMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.headers.authorization) {
+        next(http_errors_1.default(401, { message: "Authorization required" }));
+    }
+    else {
+        const decoded = atob_1.default(req.headers.authorization.split(" ")[1]);
+        const [email, password] = decoded.split(":");
+        const user = yield userSchema_1.default.checkCredentials(email, password);
+        if (user) {
+            req.user = user;
+            next();
+        }
+        else {
+            next(http_errors_1.default(401, { message: "Credentials wrong" }));
+        }
+    }
+});
+>>>>>>> developement
 exports.basicAuthMiddleware = basicAuthMiddleware;

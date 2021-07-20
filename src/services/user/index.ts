@@ -6,6 +6,8 @@ import {JWTAuthenticate} from "../../lib/auth/tools";
 const cloudinary = require("cloudinary").v2;
 const {CloudinaryStorage} = require("multer-storage-cloudinary");
 const multer = require("multer");
+import passport from "passport";
+
 
 const userRouter = express.Router();
 
@@ -147,6 +149,65 @@ userRouter.get(
 			next(error);
 		}
 	}
+);
+
+userRouter.get(
+  "/me/friends",
+  JWTMiddleWare,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.status(200).send(req.user.friends);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
+
+userRouter.post(
+  "/me/friends/:userId",
+  JWTMiddleWare,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const friend = await UserModel.findById(req.params.userId);
+      if (friend) {
+        if (req.user.friends.indexOf(req.params.userId) === -1) {
+          req.user.friends.push(req.params.userId);
+          await req.user.save();
+        }
+        res.status(200).send();
+      } else {
+        next(createError(404, { message: "User not found." }));
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
+
+userRouter.get(
+  "/googlelogin",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+userRouter.get(
+  "/googleRedirect",
+  passport.authenticate("google"),
+  async (req, res, next) => {
+    try {
+      res.cookie("accessToken", req.user.tokens.accessToken, {
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", req.user.tokens.refreshToken, {
+        httpOnly: true,
+      });
+      if (process.env.FE_URL !== undefined)
+        res.status(200).redirect(process.env.FE_URL);
+    } catch (error) {
+      next(error);
+    }
+  }
 );
 
 export default userRouter;

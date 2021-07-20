@@ -1,4 +1,4 @@
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, SchemaType } from "mongoose";
 import { User } from "../../types/interfaces";
 import bcrypt from "bcrypt";
 
@@ -7,6 +7,14 @@ const { model, Schema } = mongoose;
 interface UserModel extends Model<User> {
   checkCredentials(email: string, password: string): {} | null;
 }
+
+const ChatsReferenceSchema = new Schema(
+  {
+    chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
+    hidden: { type: Boolean, default: false },
+  },
+  { _id: false }
+);
 
 const UserSchema = new Schema<User, UserModel>(
   {
@@ -20,14 +28,9 @@ const UserSchema = new Schema<User, UserModel>(
     password: { type: String },
     online: { type: Boolean, default: false },
     lastSeen: { type: Date },
-    friends: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
+    friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     refreshToken: { type: String },
-    chats: [
-      {
-        chatId: { type: Schema.Types.ObjectId, ref: "Chat", required: true },
-        hidden: { type: Boolean, default: false },
-      },
-    ],
+    chats: [ChatsReferenceSchema],
   },
   { timestamps: true }
 );

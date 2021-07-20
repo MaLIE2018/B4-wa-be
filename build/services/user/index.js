@@ -1,4 +1,5 @@
 "use strict";
+<<<<<<< HEAD
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -10,6 +11,8 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+=======
+>>>>>>> developement
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -19,6 +22,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+<<<<<<< HEAD
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -46,10 +50,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+=======
+>>>>>>> developement
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 var express_1 = __importDefault(require("express"));
 var http_errors_1 = __importDefault(require("http-errors"));
 var auth_1 = require("../../lib/auth/auth");
@@ -224,6 +231,51 @@ userRouter.get("/logout", auth_1.JWTMiddleWare, function (req, res, next) { retu
         return [2 /*return*/];
     });
 }); });
+=======
+const express_1 = __importDefault(require("express"));
+const http_errors_1 = __importDefault(require("http-errors"));
+const auth_1 = require("../../lib/auth/auth");
+const userSchema_1 = __importDefault(require("./userSchema"));
+const tools_1 = require("../../lib/auth/tools");
+const userRouter = express_1.default.Router();
+userRouter.post("/register", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const newUser = new userSchema_1.default(req.body);
+        yield newUser.save();
+        res.status(201).send(newUser);
+    }
+    catch (error) {
+        next(http_errors_1.default(500, { message: error.message }));
+    }
+}));
+userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (req.user) {
+            const { accessToken, refreshToken } = yield tools_1.JWTAuthenticate(req.user);
+            res.cookie("access_token", accessToken, { httpOnly: true }); //sameSite: none, secure:true
+            res.cookie("refresh_token", refreshToken, { httpOnly: true });
+            res.status(200).send(req.user);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+}));
+userRouter.get("/logout", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (req.user) {
+            res.clearCookie("access_token");
+            res.clearCookie("refresh_token");
+            res.status(200).send();
+        }
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+}));
+>>>>>>> developement
 exports.default = userRouter;
 // every route with Authentication
 //logout

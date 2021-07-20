@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+<<<<<<< HEAD
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -35,15 +36,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+=======
+>>>>>>> developement
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 var app_1 = __importDefault(require("./app"));
 var socket_io_1 = require("socket.io");
 var userSchema_1 = __importDefault(require("./services/user/userSchema"));
 var chatSchema_1 = __importDefault(require("./services/chat/chatSchema"));
 var io = new socket_io_1.Server(app_1.default, {
+=======
+const app_1 = __importDefault(require("./app"));
+const socket_io_1 = require("socket.io");
+const userSchema_1 = __importDefault(require("./services/user/userSchema"));
+const chatSchema_1 = __importDefault(require("./services/chat/chatSchema"));
+const io = new socket_io_1.Server(app_1.default, {
+>>>>>>> developement
     cors: {
         origin: process.env.FE_URL,
         methods: ["GET", "POST", "DELETE", "PUT"],
@@ -52,6 +63,7 @@ var io = new socket_io_1.Server(app_1.default, {
     },
     allowEIO3: true,
 });
+<<<<<<< HEAD
 io.on("connect", function (socket) {
     console.log(socket.id);
     socket.on("joinRooms", function (rooms) { return __awaiter(void 0, void 0, void 0, function () {
@@ -93,5 +105,25 @@ io.on("connect", function (socket) {
             }
         });
     }); });
+=======
+io.on("connect", (socket) => {
+    socket.on("connect", (userId, rooms) => __awaiter(void 0, void 0, void 0, function* () {
+        yield userSchema_1.default.findByIdAndUpdate(userId, { online: true }, { useFindAndModify: false });
+        rooms.forEach((room) => {
+            if (!room.hidden)
+                socket.join(room.chatId);
+        });
+    }));
+    //Can I use nested Socket calls?
+    socket.on("sendMessage", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
+        yield chatSchema_1.default.findByIdAndUpdate({ _id: chatId }, {
+            $push: { messages: message },
+        }, { useFindAndModify: false });
+        socket.to(chatId).emit("message", message);
+    }));
+    socket.on("disconnect", (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        yield userSchema_1.default.findOneAndUpdate({ _id: userId }, { online: false });
+    }));
+>>>>>>> developement
 });
 exports.default = app_1.default;

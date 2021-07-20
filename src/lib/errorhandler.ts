@@ -39,11 +39,11 @@ const forbidden: ErrorHandler = (err, req, res, next) => {
 };
 
 const catchAll: ErrorHandler = (err, req, res, next) => {
-	if (err) {
-		console.log(err);
-		res.status(500).send("Generic Server Error");
-	}
-	next();
+  if (err) {
+    res.status(500).send("Generic Server Error");
+    console.log(err);
+  }
+  next();
 };
 
 export default [notFound, badRequest, notAuthorized, forbidden, catchAll];

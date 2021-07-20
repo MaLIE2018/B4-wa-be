@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+<<<<<<< HEAD
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -35,14 +36,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+=======
+>>>>>>> developement
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+<<<<<<< HEAD
 var mongoose_1 = __importDefault(require("mongoose"));
 var bcrypt_1 = __importDefault(require("bcrypt"));
 var model = mongoose_1.default.model, Schema = mongoose_1.default.Schema;
 var UserSchema = new Schema({
+=======
+const mongoose_1 = __importDefault(require("mongoose"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const { model, Schema } = mongoose_1.default;
+const ChatsReferenceSchema = new Schema({
+    chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
+    hidden: { type: Boolean, default: false },
+}, { _id: false });
+const UserSchema = new Schema({
+>>>>>>> developement
     profile: {
         username: { type: String },
         firstName: { type: String, required: true },
@@ -55,6 +69,7 @@ var UserSchema = new Schema({
     lastSeen: { type: Date },
     friends: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
     refreshToken: { type: String },
+<<<<<<< HEAD
     chats: [
         {
             chatId: { type: Schema.Types.ObjectId, ref: "Chat", required: true },
@@ -65,12 +80,20 @@ var UserSchema = new Schema({
 UserSchema.methods.toJSON = function () {
     var user = this;
     var userObj = user.toObject();
+=======
+    chats: [ChatsReferenceSchema],
+}, { timestamps: true });
+UserSchema.methods.toJSON = function () {
+    const user = this;
+    const userObj = user.toObject();
+>>>>>>> developement
     delete userObj.refreshToken;
     delete userObj.password;
     delete userObj.__v;
     return userObj;
 };
 UserSchema.pre("save", function () {
+<<<<<<< HEAD
     return __awaiter(this, void 0, void 0, function () {
         var newUser, _a;
         return __generator(this, function (_b) {
@@ -109,6 +132,28 @@ UserSchema.static("checkCredentials", function checkCredentials(email, password)
                 case 4: return [2 /*return*/];
             }
         });
+=======
+    return __awaiter(this, void 0, void 0, function* () {
+        const newUser = this;
+        if (newUser.isModified("password")) {
+            newUser.password = yield bcrypt_1.default.hash(newUser.password, 10);
+        }
+    });
+});
+UserSchema.static("checkCredentials", function checkCredentials(email, password) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield this.findOne({ "profile.email": email });
+        if (user) {
+            const isMatch = yield bcrypt_1.default.compare(password, user.password);
+            if (isMatch)
+                return user;
+            else
+                return null;
+        }
+        else {
+            return null;
+        }
+>>>>>>> developement
     });
 });
 exports.default = model("User", UserSchema);

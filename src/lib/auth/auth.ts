@@ -11,7 +11,9 @@ export const JWTMiddleWare: Middleware = async (req, res, next) => {
 		try {
 			const content = await verifyAccessToken(req.cookies.access_token);
 
-			const user = await UserModel.findById(content._id);
+      const user = await UserModel.findById(content._id).populate("friends", {
+        profile: 1,
+      });
 
 			if (user) {
 				req.user = user;

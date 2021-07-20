@@ -1,0 +1,2 @@
+When adding a user to a chat
+User.findByIdAndUpdate(id, { $addToSet : {accounts : accountId } } )
