@@ -16,7 +16,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const { model, Schema } = mongoose_1.default;
 const ChatsReferenceSchema = new Schema({
-    chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
+    chat: { type: Schema.Types.ObjectId, ref: "Chat" },
     hidden: { type: Boolean, default: false },
 }, { _id: false });
 const UserSchema = new Schema({
@@ -52,13 +52,19 @@ UserSchema.pre("save", function () {
 });
 UserSchema.static("checkCredentials", function checkCredentials(email, password) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield this.findOne({ "profile.email": email });
+        const user = yield this.findOne({ "profile.email": email }).populate("friends", {
+            profile: 1,
+        });
         if (user) {
             const isMatch = yield bcrypt_1.default.compare(password, user.password);
-            if (isMatch)
+            if (isMatch) {
+                user.chats = user.chats.filter((c) => c.hidden === false);
+                yield user.save();
                 return user;
-            else
+            }
+            else {
                 return null;
+            }
         }
         else {
             return null;

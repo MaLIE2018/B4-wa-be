@@ -1,8 +1,9 @@
 import server from "./app";
 import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
-import ChatModel from "./services/chat/chatSchema";
+import MessageModel from "./services/message/messageSchema";
 import { ChatList, Message } from "./types/interfaces";
+import ChatModel from "./services/chat/chatSchema";
 
 const io = new Server(server, {
   cors: {
@@ -14,35 +15,37 @@ const io = new Server(server, {
   allowEIO3: true,
 });
 
-io.on("connect", (socket) => {
+io.on("connection", (socket) => {
   socket.on("connect", async (userId, chats: ChatList[]) => {
     await UserModel.findByIdAndUpdate(
-      userId,
+      userId as string,
       { online: true },
       { useFindAndModify: false }
     );
     chats.forEach((chat) => {
-      if (!chat.hidden) socket.join(chat.chatId);
+      socket.join(chat.chat);
     });
     socket.emit("loggedIn");
   });
 
-  socket.on("newChat", async (chatId) => {
+  socket.on("joinRoom", async (chatId) => {
     socket.join(chatId);
-  });
-  socket.on("leaveChat", async (chatId) => {
-    socket.leave(chatId);
+    console.log("Rooms", socket.rooms);
   });
 
-  socket.on("sendMessage", async (message: Message, chatId) => {
-    await ChatModel.findByIdAndUpdate(
-      { _id: chatId },
-      {
-        $push: { messages: message },
-      },
-      { useFindAndModify: false }
-    );
-    socket.to(chatId).emit("message", message);
+  socket.on("leaveRoom", async (chatId) => {
+    socket.leave(chatId);
+    console.log("newChat", socket.rooms);
+  });
+
+  socket.on("sendMessage", async (message: Message) => {
+    const nm = new MessageModel(message);
+    await nm.save();
+    await ChatModel.findByIdAndUpdate(message.chatId, {
+      latestMessage: nm,
+    });
+    socket.to(message.chatId).emit("message", "test");
+    socket.emit("message", message.text);
   });
 
   socket.on("disconnect", async (userId) => {
