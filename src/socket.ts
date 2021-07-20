@@ -15,15 +15,16 @@ const io = new Server(server, {
 });
 
 io.on("connect", (socket) => {
-  socket.on("connect", async (userId, rooms: ChatList[]) => {
+  socket.on("connect", async (userId, chats: ChatList[]) => {
     await UserModel.findByIdAndUpdate(
       userId,
       { online: true },
       { useFindAndModify: false }
     );
-    rooms.forEach((room) => {
-      if (!room.hidden) socket.join(room.chatId);
+    chats.forEach((chat) => {
+      if (!chat.hidden) socket.join(chat.chatId);
     });
+    socket.emit("loggedIn");
   });
   //Can I use nested Socket calls?
 
@@ -36,6 +37,10 @@ io.on("connect", (socket) => {
       { useFindAndModify: false }
     );
     socket.to(chatId).emit("message", message);
+  });
+
+  socket.on("leaveChat", async (chatId) => {
+    socket.leave(chatId);
   });
 
   socket.on("disconnect", async (userId) => {
