@@ -52,7 +52,9 @@ chatRouter.post("/", async (req, res, next) => {
 //Get Chat by ID
 chatRouter.get("/:id", async (req, res, next) => {
   try {
-    const chat = await ChatModel.findById(req.params.id);
+    const chat = await ChatModel.findById(req.params.id)
+      .populate("participants", { profile: 1 })
+      .populate("messages");
     if (chat) res.status(200).send({ chat });
     else res.status(404).send();
   } catch (error) {

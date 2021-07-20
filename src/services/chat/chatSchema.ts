@@ -18,6 +18,4 @@ export const ChatSchema = new Schema<Chat>({
   name: { type: String },
 });
 
-//MessageSchema.pre("save", function () {});
-
 export default model("Chat", ChatSchema);
