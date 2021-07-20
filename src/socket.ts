@@ -2,7 +2,8 @@ import server from "./app";
 import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
 import ChatModel from "./services/chat/chatSchema";
-import { ChatList, Message } from "./types/interfaces";
+import { ChatList, extendedMessage, Message } from "./types/interfaces";
+import { isSemicolonClassElement } from "typescript";
 
 const io = new Server(server, {
   cors: {
@@ -14,35 +15,39 @@ const io = new Server(server, {
   allowEIO3: true,
 });
 
-io.on("connect", (socket) => {
+io.on("connection", (socket) => {
   socket.on("connect", async (userId, chats: ChatList[]) => {
     await UserModel.findByIdAndUpdate(
-      userId,
+      userId as string,
       { online: true },
       { useFindAndModify: false }
     );
     chats.forEach((chat) => {
-      if (!chat.hidden) socket.join(chat.chatId);
+      socket.join(chat.chatId);
     });
     socket.emit("loggedIn");
   });
 
-  socket.on("newChat", async (chatId) => {
+  socket.on("joinRoom", async (chatId) => {
     socket.join(chatId);
-  });
-  socket.on("leaveChat", async (chatId) => {
-    socket.leave(chatId);
+    console.log("Rooms", socket.rooms);
   });
 
-  socket.on("sendMessage", async (message: Message, chatId) => {
+  socket.on("leaveRoom", async (chatId) => {
+    socket.leave(chatId);
+    console.log("newChat", socket.rooms);
+  });
+
+  socket.on("sendMessage", async (message: extendedMessage) => {
     await ChatModel.findByIdAndUpdate(
-      { _id: chatId },
+      message.chatId,
       {
         $push: { messages: message },
       },
       { useFindAndModify: false }
     );
-    socket.to(chatId).emit("message", message);
+    socket.to(message.chatId).emit("message", "test");
+    socket.emit("message", message.text);
   });
 
   socket.on("disconnect", async (userId) => {

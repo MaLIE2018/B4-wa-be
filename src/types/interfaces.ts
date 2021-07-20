@@ -42,6 +42,9 @@ export interface Message {
   hidden?: string[];
   content?: string[];
 }
+export interface extendedMessage extends Message {
+  chatId: string;
+}
 
 export interface Chat {
   participants: string[];
