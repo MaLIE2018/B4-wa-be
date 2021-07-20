@@ -1,5 +1,4 @@
 import express from "express";
-import { nextTick } from "node:process";
 import { ChatList } from "../../types/interfaces";
 import ChatModel from "../chat/chatSchema";
 import UserModel from "../user/userSchema";

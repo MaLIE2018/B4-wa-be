@@ -28,7 +28,7 @@ const UserSchema = new Schema<User, UserModel>(
     password: { type: String },
     online: { type: Boolean, default: false },
     lastSeen: { type: Date },
-    friends: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
+    friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     refreshToken: { type: String },
     chats: [ChatsReferenceSchema],
   },
