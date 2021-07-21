@@ -48,13 +48,6 @@ export interface Message {
   type: string;
   hidden?: string[];
   content?: string[];
-  position: Position;
-  chatId: string;
-}
-
-enum Position {
-  "left",
-  "right",
 }
 
 export interface Chat {
@@ -67,5 +60,5 @@ export interface Chat {
 
 export interface ChatList {
   hidden: boolean;
-  chat: string;
+  chat: { _id: string };
 }

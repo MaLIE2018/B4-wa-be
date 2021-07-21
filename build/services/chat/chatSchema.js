@@ -8,13 +8,12 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const { model, Schema } = mongoose_1.default;
 const MessageSchema = new Schema({
     text: { type: String, required: true },
-    userId: { type: mongoose_1.default.Types.ObjectId, ref: "User", required: true },
+    userId: { type: mongoose_1.default.Types.ObjectId, ref: "User" },
     hidden: [{ type: mongoose_1.default.Types.ObjectId, ref: "User" }],
     content: [{ type: String }],
     type: { type: String, default: "text" },
-    position: { type: String, enum: ["left", "right"] },
     date: { type: Date, default: new Date() },
-});
+}, { strict: false });
 exports.ChatSchema = new Schema({
     participants: [
         { type: mongoose_1.default.Types.ObjectId, ref: "User", required: true },

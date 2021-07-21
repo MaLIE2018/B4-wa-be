@@ -1,7 +1,7 @@
 import server from "./app";
 import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
-import { Chat, Message, Profile } from "./types/interfaces";
+import { ChatList, Message, Profile } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
 import mongoose from "mongoose";
 
@@ -16,7 +16,7 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  socket.on("connect-chats", async (userId, chats: Chat[]) => {
+  socket.on("connect-chats", async (userId, chats: ChatList[]) => {
     try {
       await UserModel.findByIdAndUpdate(
         userId,
@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
       console.log(error);
     }
     chats.forEach((chat) => {
-      socket.join(chat._id!);
+      socket.join(chat.chat._id!);
     });
     socket.emit("loggedIn", "connected");
     console.log(socket.id, socket.rooms);
@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
   socket.on("delete-message-for-me", async (messageId, userId, chatId) => {
     try {
       const message = ChatModel.findByIdAndUpdate(chatId, {
-        $push: { hidden: { userId } },
+        $push: { hidden: userId },
       });
     } catch (error) {
       console.log(error);
@@ -75,18 +75,21 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("send-message", async (message: Message) => {
-    console.log("message:", message);
+  socket.on("send-message", async (message: Message, chatId: string) => {
     await ChatModel.findByIdAndUpdate(
-      message.chatId,
+      chatId,
       {
         latestMessage: message,
-        $push: { history: { message } },
+        $push: { history: message },
       },
-      { useFindAndModify: false }
+      { new: true, useFindAndModify: true }
     );
-    socket.to(message.chatId).emit("receive-message", message);
-    // socket.emit("receive-message", nm);
+    socket.to(chatId).emit("receive-message", message);
+    // socket.emit("receive-message", message);
+  });
+
+  socket.on("im-typing", (chatId: string) => {
+    socket.to(chatId).emit("is-typing");
   });
 
   socket.on("offline", async (userId) => {
