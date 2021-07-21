@@ -52,8 +52,16 @@ UserSchema.pre("save", function () {
 });
 UserSchema.static("checkCredentials", function checkCredentials(email, password) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield this.findOne({ "profile.email": email }).populate("friends", {
+        const user = yield this.findOne({ "profile.email": email })
+            .populate("friends", {
             profile: 1,
+        })
+            .populate({
+            path: "chats.chat",
+            populate: {
+                path: "participants",
+                select: "profile",
+            },
         });
         if (user) {
             const isMatch = yield bcrypt_1.default.compare(password, user.password);
