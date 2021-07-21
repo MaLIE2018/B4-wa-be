@@ -6,8 +6,7 @@ import {JWTAuthenticate} from "../../lib/auth/tools";
 const cloudinary = require("cloudinary").v2;
 const {CloudinaryStorage} = require("multer-storage-cloudinary");
 const multer = require("multer");
-import oauth from "../../lib/auth/oauth";
-import passport from "passport";
+import passport from "../../lib/auth/oauth";
 
 const userRouter = express.Router();
 
