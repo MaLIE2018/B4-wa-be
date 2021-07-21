@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
             console.log(error);
         }
         chats.forEach((chat) => {
-            socket.join(chat._id);
+            socket.join(chat.chat._id);
         });
         socket.emit("loggedIn", "connected");
         console.log(socket.id, socket.rooms);
