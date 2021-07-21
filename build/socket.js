@@ -16,7 +16,6 @@ const app_1 = __importDefault(require("./app"));
 const socket_io_1 = require("socket.io");
 const userSchema_1 = __importDefault(require("./services/user/userSchema"));
 const chatSchema_1 = __importDefault(require("./services/chat/chatSchema"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const io = new socket_io_1.Server(app_1.default, {
     cors: {
         origin: process.env.FE_URL,
@@ -27,12 +26,9 @@ const io = new socket_io_1.Server(app_1.default, {
     allowEIO3: true,
 });
 io.on("connection", (socket) => {
-    console.log(socket.id);
     socket.on("connect-chats", (userId, chats) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            if (!mongoose_1.default.Types.ObjectId.isValid(userId)) {
-                yield userSchema_1.default.findByIdAndUpdate(userId, { online: true }, { useFindAndModify: false });
-            }
+            yield userSchema_1.default.findByIdAndUpdate(userId, { online: true, "profile.socketId": socket.id }, { useFindAndModify: false });
         }
         catch (error) {
             console.log(error);
@@ -41,10 +37,15 @@ io.on("connection", (socket) => {
             socket.join(chat._id);
         });
         socket.emit("loggedIn", "connected");
-        console.log(socket.rooms);
+        console.log(socket.id, socket.rooms);
     }));
-    socket.on("joinRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
-        socket.join(chatId);
+    socket.on("joinRoom", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
+        participants.map((participant) => {
+            const socketId = participant.profile.socketId;
+            io.of("/").adapter.on("join-room", (chatId, socketId) => {
+                console.log(`socket ${socketId} has joined room ${chatId}`);
+            });
+        });
     }));
     socket.on("leaveRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.leave(chatId);
@@ -76,6 +77,7 @@ io.on("connection", (socket) => {
         socket.emit("message-deleted");
     }));
     socket.on("send-message", (message) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("message:", message);
         yield chatSchema_1.default.findByIdAndUpdate(message.chatId, {
             latestMessage: message,
             $push: { history: { message } },
@@ -86,6 +88,7 @@ io.on("connection", (socket) => {
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
         yield userSchema_1.default.findOneAndUpdate({ _id: userId }, { online: false }, { useFindAndModify: false });
         socket.emit("loggedOut", "loggedOut");
+        socket.disconnect();
     }));
 });
 exports.default = app_1.default;

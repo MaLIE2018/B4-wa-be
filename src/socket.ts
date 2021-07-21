@@ -1,7 +1,7 @@
 import server from "./app";
 import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
-import { Chat, Message } from "./types/interfaces";
+import { Chat, Message, Profile } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
 import mongoose from "mongoose";
 
@@ -16,16 +16,13 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log(socket.id);
   socket.on("connect-chats", async (userId, chats: Chat[]) => {
     try {
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        await UserModel.findByIdAndUpdate(
-          userId,
-          { online: true },
-          { useFindAndModify: false }
-        );
-      }
+      await UserModel.findByIdAndUpdate(
+        userId,
+        { online: true, "profile.socketId": socket.id },
+        { useFindAndModify: false }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -33,11 +30,16 @@ io.on("connection", (socket) => {
       socket.join(chat._id!);
     });
     socket.emit("loggedIn", "connected");
-    console.log(socket.rooms);
+    console.log(socket.id, socket.rooms);
   });
 
-  socket.on("joinRoom", async (chatId) => {
-    socket.join(chatId);
+  socket.on("joinRoom", async (chatId, participants: Profile[]) => {
+    participants.map((participant) => {
+      const socketId = participant.profile.socketId;
+      io.of("/").adapter.on("join-room", (chatId, socketId) => {
+        console.log(`socket ${socketId} has joined room ${chatId}`);
+      });
+    });
   });
 
   socket.on("leaveRoom", async (chatId) => {
@@ -74,6 +76,7 @@ io.on("connection", (socket) => {
   );
 
   socket.on("send-message", async (message: Message) => {
+    console.log("message:", message);
     await ChatModel.findByIdAndUpdate(
       message.chatId,
       {
@@ -93,6 +96,7 @@ io.on("connection", (socket) => {
       { useFindAndModify: false }
     );
     socket.emit("loggedOut", "loggedOut");
+    socket.disconnect();
   });
 });
 

@@ -32,7 +32,7 @@ chatRouter.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             participants: [...req.body.participants, req.user._id],
         });
         if (matchIt === null) {
-            const chat = new chatSchema_1.default(Object.assign(Object.assign({}, req.body), { participants: [...req.body.participants, req.user._id] }));
+            const chat = new chatSchema_1.default(Object.assign(Object.assign({}, req.body), { participants: [...req.body.participants, req.user._id], owner: req.user._id }));
             yield chat.save();
             yield Promise.all(chat.participants.map((participantId) => __awaiter(void 0, void 0, void 0, function* () {
                 return yield userSchema_1.default.findByIdAndUpdate(participantId, {
@@ -49,14 +49,12 @@ chatRouter.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         next(error);
     }
 }));
-//Get Chat by ID
+//Get Chat messages by ID
 chatRouter.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const chat = yield chatSchema_1.default.findById(req.params.id)
-            .populate("participants", { profile: 1 })
-            .populate("messages");
+        const chat = yield chatSchema_1.default.findById(req.params.id, { history: 1 });
         if (chat)
-            res.status(200).send({ chat });
+            res.status(200).send(chat);
         else
             res.status(404).send();
     }

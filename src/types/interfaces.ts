@@ -6,8 +6,7 @@ export type Middleware = (
   next: NextFunction
 ) => void;
 
-export interface User {
-  _id?: string;
+export interface Profile {
   profile: {
     username?: string;
     firstName: string;
@@ -15,7 +14,13 @@ export interface User {
     email: string;
     avatar?: string;
     googleId?: string;
+    socketId?: string;
   };
+  password?: string;
+}
+
+export interface User extends Profile {
+  _id?: string;
   password?: string;
   status?: boolean;
   lastSeen?: string;
@@ -32,6 +37,7 @@ export interface TestUser {
     lastName: string;
     email: string;
     avatar?: string;
+    socketId?: string;
   };
   password?: string;
 }
@@ -39,15 +45,23 @@ export interface TestUser {
 export interface Message {
   text: string;
   userId: string;
+  type: string;
   hidden?: string[];
   content?: string[];
+  position: Position;
   chatId: string;
+}
+
+enum Position {
+  "left",
+  "right",
 }
 
 export interface Chat {
   participants: string[];
   history: [];
   name: string;
+  owner: string;
   _id?: string;
 }
 

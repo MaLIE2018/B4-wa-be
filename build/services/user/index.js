@@ -22,6 +22,21 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
 const passport_1 = __importDefault(require("passport"));
 const userRouter = express_1.default.Router();
+userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("req.params.query:", req.params.query);
+        const users = yield userSchema_1.default.find({
+            $text: { $search: req.params.query },
+        });
+        if (users)
+            res.status(200).send(users);
+        else
+            res.status(204).send(users);
+    }
+    catch (error) {
+        next(error);
+    }
+}));
 userRouter.post("/register", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newUser = yield new userSchema_1.default(req.body).save();
@@ -107,7 +122,7 @@ userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __await
     try {
         if (req.user) {
             const { accessToken, refreshToken } = yield tools_1.JWTAuthenticate(req.user);
-            res.cookie("access_token", accessToken, { httpOnly: true }); //sameSite: none, secure:true
+            res.cookie("access_token", accessToken, { httpOnly: true, sameSite: none, secure:true }); //
             res.cookie("refresh_token", refreshToken, { httpOnly: true });
             res.status(200).send(req.user);
         }
@@ -155,13 +170,6 @@ userRouter.post("/me/friends/:userId", auth_1.JWTMiddleWare, (req, res, next) =>
     }
     catch (error) {
         console.log(error);
-        next(error);
-    }
-}));
-userRouter.get("/findUser", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-    }
-    catch (error) {
         next(error);
     }
 }));

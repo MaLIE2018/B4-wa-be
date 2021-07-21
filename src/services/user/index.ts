@@ -9,6 +9,18 @@ const multer = require("multer");
 import passport from "passport";
 const userRouter = express.Router();
 
+userRouter.get("/finduser/:query", async (req, res, next) => {
+  try {
+    console.log("req.params.query:", req.params.query);
+    const users = await UserModel.find({
+      $text: { $search: req.params.query },
+    });
+    if (users) res.status(200).send(users);
+    else res.status(204).send(users);
+  } catch (error) {
+    next(error);
+  }
+});
 userRouter.post(
   "/register",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -183,13 +195,6 @@ userRouter.post(
     }
   }
 );
-
-userRouter.get("/findUser", async (req, res, next) => {
-  try {
-  } catch (error) {
-    next(error);
-  }
-});
 
 userRouter.get(
   "/googlelogin",

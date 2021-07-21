@@ -22,11 +22,12 @@ const UserSchema = new Schema<User, UserModel>(
       username: { type: String },
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
+      socketId: { type: String, default: "" },
       email: {
         type: String,
+        index: { type: "text", sparse: true },
         required: true,
         unique: true,
-        index: { type: "text" },
       },
       avatar: { type: String, default: "https://source.unsplash.com/random" },
     },
