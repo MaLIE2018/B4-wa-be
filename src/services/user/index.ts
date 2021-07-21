@@ -196,6 +196,14 @@ userRouter.post(
   }
 );
 
+userRouter.get("/me", JWTMiddleWare, async (req: any, res, next) => {
+  try {
+    res.status(200).send(req.user);
+  } catch (error) {
+    next(error);
+  }
+});
+
 userRouter.get(
   "/googlelogin",
   passport.authenticate("google", { scope: ["profile", "email"] })
