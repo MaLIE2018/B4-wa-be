@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const passport_1 = __importDefault(require("passport"));
+<<<<<<< HEAD
 // import GoogleStrategy from "passport-google-oauth20";
 var GoogleStrategy = require("passport-google-oauth").OAuthStrategy;
 const userSchema_1 = __importDefault(require("../../services/user/userSchema"));
@@ -48,6 +49,47 @@ passport_1.default.use(new GoogleStrategy({
         passportNext(error);
     }
 })));
+=======
+const userSchema_1 = __importDefault(require("../../services/user/userSchema"));
+const tools_1 = require("./tools");
+const passport_google_oauth20_1 = require("passport-google-oauth20");
+let GoogleStrat;
+if (process.env.GOOGLE_ID !== undefined &&
+    process.env.GOOGLE_SECRET !== undefined) {
+    GoogleStrat = new passport_google_oauth20_1.Strategy({
+        clientID: process.env.GOOGLE_ID,
+        clientSecret: process.env.GOOGLE_SECRET,
+        callbackURL: "/users/googleRedirect",
+    }, (accessToken, refreshToken, profile, passportNext) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            console.log("profile:", profile);
+            const user = yield userSchema_1.default.findOne({ googleId: profile.id });
+            if (user) {
+                const tokens = yield tools_1.JWTAuthenticate(user);
+                passportNext(null, { user, tokens });
+            }
+            else {
+                const newUser = {
+                    profile: {
+                        firstName: profile.name.givenName,
+                        lastName: profile.name.lastName,
+                        email: profile.emails[0].value,
+                        googleId: profile.id,
+                    },
+                };
+                const createdUser = new userSchema_1.default(newUser);
+                const savedUser = yield createdUser.save();
+                const tokens = yield tools_1.JWTAuthenticate(savedUser);
+                passportNext(null, { user: savedUser, tokens });
+            }
+        }
+        catch (error) {
+            passportNext(error);
+        }
+    }));
+    passport_1.default.use("google", GoogleStrat);
+}
+>>>>>>> developement
 passport_1.default.serializeUser(function (user, passportNext) {
     // this is for req.user
     passportNext(null, user);

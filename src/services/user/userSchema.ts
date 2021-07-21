@@ -10,7 +10,7 @@ interface UserModel extends Model<User> {
 
 const ChatsReferenceSchema = new Schema(
   {
-    chatId: { type: Schema.Types.ObjectId, ref: "Chat" },
+    chat: { type: Schema.Types.ObjectId, ref: "Chat" },
     hidden: { type: Boolean, default: false },
   },
   { _id: false }
@@ -55,12 +55,27 @@ UserSchema.pre("save", async function () {
 UserSchema.static(
   "checkCredentials",
   async function checkCredentials(email, password) {
-    const user = await this.findOne({ "profile.email": email });
+    const user = await this.findOne({ "profile.email": email })
+      .populate("friends", {
+        profile: 1,
+      })
+      .populate({
+        path: "chats.chat",
+        populate: {
+          path: "participants",
+          select: "profile",
+        },
+      });
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password!);
 
-      if (isMatch) return user;
-      else return null;
+      if (isMatch) {
+        user.chats = user.chats.filter((c) => c.hidden === false);
+        await user.save();
+        return user;
+      } else {
+        return null;
+      }
     } else {
       return null;
     }

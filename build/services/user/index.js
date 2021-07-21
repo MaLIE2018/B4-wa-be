@@ -82,7 +82,11 @@ userRouter.put("/profile", auth_1.JWTMiddleWare, upload, (req, res, next) => __a
         // next(createError(500, {message: error.message}));
     }
 }));
+<<<<<<< HEAD
 userRouter.get("/all", auth_1.basicAuthMiddleware, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+=======
+userRouter.get("/all", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+>>>>>>> developement
     try {
         const users = yield userSchema_1.default.find();
         res.status(200).send(users);
@@ -91,7 +95,11 @@ userRouter.get("/all", auth_1.basicAuthMiddleware, (req, res, next) => __awaiter
         next(http_errors_1.default(500, { message: error.message }));
     }
 }));
+<<<<<<< HEAD
 userRouter.delete("/delete", auth_1.basicAuthMiddleware, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+=======
+userRouter.delete("/delete", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+>>>>>>> developement
     try {
         const deleteUser = yield userSchema_1.default.findByIdAndDelete(req.user._id);
         if (deleteUser)
@@ -167,17 +175,17 @@ userRouter.get("/googleRedirect", passport_1.default.authenticate("google"), (re
         res.cookie("refreshToken", req.user.tokens.refreshToken, {
             httpOnly: true,
         });
+<<<<<<< HEAD
         res.send("OK");
         //   if (process.env.FE_URL !== undefined)
         //     res.status(200).redirect(process.env.FE_URL);
+=======
+        if (process.env.FE_URL !== undefined)
+            res.status(200).redirect(process.env.FE_URL);
+>>>>>>> developement
     }
     catch (error) {
         next(error);
     }
 }));
 exports.default = userRouter;
-// every route with Authentication
-//logout
-//add friend to friendList //delete friends
-//get all my friends.profiles
-//put profile
