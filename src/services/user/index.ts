@@ -152,6 +152,9 @@ userRouter.get(
   }
 );
 
+// res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
+// res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true, expire: 604800000 + Date.now() });
+
 userRouter.get(
   "/logout",
   JWTMiddleWare,
