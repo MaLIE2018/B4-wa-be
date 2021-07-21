@@ -19,20 +19,8 @@ const chatRouter = express_1.default.Router();
 //Get all my Chats
 chatRouter.get("/me", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield userSchema_1.default.findById(req.user._id).populate({
-            path: "chats.chat",
-            populate: {
-                path: "participants",
-                select: "profile",
-            },
-        });
-        //select: { messages: { $slice: ["$messages", -1] } },
-        if (user !== null) {
-            res.status(200).send(user.chats);
-        }
-        else {
-            next();
-        }
+        const chats = yield chatSchema_1.default.find({ participants: req.user._id }, { history: 0 }).populate("participants", { profile: 1 });
+        res.status(200).send(chats);
     }
     catch (error) {
         next(error);

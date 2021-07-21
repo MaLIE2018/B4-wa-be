@@ -46,8 +46,9 @@ export interface Message {
 
 export interface Chat {
   participants: string[];
-  messages: [];
+  history: [];
   name: string;
+  _id?: string;
 }
 
 export interface ChatList {

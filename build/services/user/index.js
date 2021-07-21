@@ -158,6 +158,13 @@ userRouter.post("/me/friends/:userId", auth_1.JWTMiddleWare, (req, res, next) =>
         next(error);
     }
 }));
+userRouter.get("/findUser", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+    }
+    catch (error) {
+        next(error);
+    }
+}));
 userRouter.get("/googlelogin", passport_1.default.authenticate("google", { scope: ["profile", "email"] }));
 userRouter.get("/googleRedirect", passport_1.default.authenticate("google"), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
