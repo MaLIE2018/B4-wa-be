@@ -122,8 +122,8 @@ userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __await
     try {
         if (req.user) {
             const { accessToken, refreshToken } = yield tools_1.JWTAuthenticate(req.user);
-            res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "None", secure:true }); //
-            res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "None", secure:true });
+            res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "None", secure:true, expire: 3600000 + Date.now() }); //
+            res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "None", secure:true, expire: 604800000 + Date.now() });
             res.status(200).send(req.user);
         }
     }
