@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
   socket.on("delete-message-for-me", async (messageId, userId, chatId) => {
     try {
       const message = ChatModel.findByIdAndUpdate(chatId, {
-        $push: { hidden: { userId } },
+        $push: { hidden: userId },
       });
     } catch (error) {
       console.log(error);
@@ -75,24 +75,17 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("send-message", async (message: Message) => {
-    let newMessage;
-    if (message.chatOwner === message.userId) {
-      newMessage = { ...message, position: "right" };
-    } else {
-      newMessage = { ...message, position: "left" };
-    }
-    delete newMessage.chatOwner;
-    const chat = await ChatModel.findByIdAndUpdate(
-      newMessage.chatId,
+  socket.on("send-message", async (message: Message, chatId: string) => {
+    await ChatModel.findByIdAndUpdate(
+      chatId,
       {
-        latestMessage: newMessage,
-        $push: { history: newMessage },
+        latestMessage: message,
+        $push: { history: message },
       },
       { new: true, useFindAndModify: true }
     );
-    socket.to(message.chatId).emit("receive-message", newMessage);
-    // socket.emit("receive-message", newMessage);
+    socket.to(chatId).emit("receive-message", message);
+    // socket.emit("receive-message", message);
   });
 
   socket.on("im-typing", (chatId: string) => {

@@ -10,10 +10,8 @@ const MessageSchema = new Schema({
     text: { type: String, required: true },
     userId: { type: mongoose_1.default.Types.ObjectId, ref: "User" },
     hidden: [{ type: mongoose_1.default.Types.ObjectId, ref: "User" }],
-    chatId: { type: String, required: true },
     content: [{ type: String }],
     type: { type: String, default: "text" },
-    position: { type: String, enum: ["left", "right"], default: "right" },
     date: { type: Date, default: new Date() },
 }, { strict: false });
 exports.ChatSchema = new Schema({

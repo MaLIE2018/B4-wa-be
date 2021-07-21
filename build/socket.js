@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
     socket.on("delete-message-for-me", (messageId, userId, chatId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const message = chatSchema_1.default.findByIdAndUpdate(chatId, {
-                $push: { hidden: { userId } },
+                $push: { hidden: userId },
             });
         }
         catch (error) {
@@ -76,22 +76,17 @@ io.on("connection", (socket) => {
         socket.to(chatId).emit("message-deleted-for-all");
         socket.emit("message-deleted");
     }));
-    socket.on("send-message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-        let newMessage;
-        if (message.chatOwner === message.userId) {
-            newMessage = Object.assign(Object.assign({}, message), { position: "right" });
-        }
-        else {
-            newMessage = Object.assign(Object.assign({}, message), { position: "left" });
-        }
-        delete newMessage.chatOwner;
-        const chat = yield chatSchema_1.default.findByIdAndUpdate(newMessage.chatId, {
-            latestMessage: newMessage,
-            $push: { history: newMessage },
+    socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
+        yield chatSchema_1.default.findByIdAndUpdate(chatId, {
+            latestMessage: message,
+            $push: { history: message },
         }, { new: true, useFindAndModify: true });
-        socket.to(message.chatId).emit("receive-message", newMessage);
-        // socket.emit("receive-message", nm);
+        socket.to(chatId).emit("receive-message", message);
+        // socket.emit("receive-message", message);
     }));
+    socket.on("im-typing", (chatId) => {
+        socket.to(chatId).emit("is-typing");
+    });
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
         yield userSchema_1.default.findOneAndUpdate({ _id: userId }, { online: false }, { useFindAndModify: false });
         socket.emit("loggedOut", "loggedOut");

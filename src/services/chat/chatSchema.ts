@@ -8,10 +8,8 @@ const MessageSchema = new Schema<Message>(
     text: { type: String, required: true },
     userId: { type: mongoose.Types.ObjectId, ref: "User" },
     hidden: [{ type: mongoose.Types.ObjectId, ref: "User" }],
-    chatId: { type: String, required: true },
     content: [{ type: String }],
     type: { type: String, default: "text" },
-    position: { type: String, enum: ["left", "right"], default: "right" },
     date: { type: Date, default: new Date() },
   },
   { strict: false }

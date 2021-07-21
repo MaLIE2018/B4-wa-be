@@ -26,7 +26,7 @@ userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0,
     try {
         console.log("req.params.query:", req.params.query);
         const users = yield userSchema_1.default.find({
-            $text: { $search: req.params.query },
+            "profile.email": { $regex: `${req.params.query}` },
         });
         if (users)
             res.status(200).send(users);
@@ -130,8 +130,8 @@ userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __await
     try {
         if (req.user) {
             const { accessToken, refreshToken } = yield tools_1.JWTAuthenticate(req.user);
-         res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
-res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true, expire: 604800000 + Date.now() });
+            res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
+            res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true, expire: 604800000 + Date.now() });
             res.status(200).send(req.user);
         }
     }
