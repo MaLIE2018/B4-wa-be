@@ -7,7 +7,6 @@ const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
 import passport from "passport";
-
 const userRouter = express.Router();
 
 userRouter.post(
@@ -184,6 +183,13 @@ userRouter.post(
     }
   }
 );
+
+userRouter.get("/findUser", async (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+});
 
 userRouter.get(
   "/googlelogin",
