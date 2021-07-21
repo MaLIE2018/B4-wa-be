@@ -21,6 +21,14 @@ userRouter.get("/finduser/:query", async (req, res, next) => {
     next(error);
   }
 });
+
+userRouter.get("/me", JWTMiddleWare, async (req: any, res, next) => {
+  try {
+    res.status(200).send(req.user);
+  } catch (error) {
+    next(error);
+  }
+});
 userRouter.post(
   "/register",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -195,26 +203,6 @@ userRouter.post(
     }
   }
 );
-
-userRouter.get("/me", JWTMiddleWare, async (req: any, res, next) => {
-  try {
-    const user = await UserModel.findById(req.user._id)
-      .populate("friends", {
-        profile: 1,
-      })
-      .populate({
-        path: "chats.chat",
-        select: { participants: 1, latestMessage: 1 },
-        populate: {
-          path: "participants",
-          select: "profile",
-        },
-      });
-    res.status(200).send(user);
-  } catch (error) {
-    next(error);
-  }
-});
 
 userRouter.get(
   "/googlelogin",

@@ -37,6 +37,14 @@ userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0,
         next(error);
     }
 }));
+userRouter.get("/me", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.status(200).send(req.user);
+    }
+    catch (error) {
+        next(error);
+    }
+}));
 userRouter.post("/register", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newUser = yield new userSchema_1.default(req.body).save();
@@ -122,8 +130,8 @@ userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __await
     try {
         if (req.user) {
             const { accessToken, refreshToken } = yield tools_1.JWTAuthenticate(req.user);
-            res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "None", secure:true, expire: 3600000 + Date.now() }); //
-            res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "None", secure:true, expire: 604800000 + Date.now() });
+            res.cookie("access_token", accessToken, { httpOnly: true }); //sameSite: none, secure:true
+            res.cookie("refresh_token", refreshToken, { httpOnly: true });
             res.status(200).send(req.user);
         }
     }

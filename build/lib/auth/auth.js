@@ -24,8 +24,17 @@ const JWTMiddleWare = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     else {
         try {
             const content = yield tools_1.verifyAccessToken(req.cookies.access_token);
-            const user = yield userSchema_1.default.findById(content._id).populate("friends", {
+            const user = yield userSchema_1.default.findById(content._id)
+                .populate("friends", {
                 profile: 1,
+            })
+                .populate({
+                path: "chats.chat",
+                select: { participants: 1, latestMessage: 1 },
+                populate: {
+                    path: "participants",
+                    select: "profile",
+                },
             });
             if (user) {
                 req.user = user;
