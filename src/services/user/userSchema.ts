@@ -33,7 +33,7 @@ const UserSchema = new Schema<User, UserModel>(
     chats: [ChatsReferenceSchema],
   },
   { timestamps: true }
-);
+)
 
 UserSchema.methods.toJSON = function () {
   const user = this;

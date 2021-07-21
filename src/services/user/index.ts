@@ -191,6 +191,7 @@ userRouter.get(
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
+
 userRouter.get(
   "/googleRedirect",
   passport.authenticate("google"),
@@ -201,14 +202,16 @@ userRouter.get(
       });
       res.cookie("refreshToken", req.user.tokens.refreshToken, {
         httpOnly: true,
-      });
-      if (process.env.FE_URL !== undefined)
-        res.status(200).redirect(process.env.FE_URL);
+	  });
+		res.send("OK")
+    //   if (process.env.FE_URL !== undefined)
+    //     res.status(200).redirect(process.env.FE_URL);
     } catch (error) {
       next(error);
     }
   }
 );
+
 
 export default userRouter;
 
