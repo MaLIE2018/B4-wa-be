@@ -50,6 +50,7 @@ export interface Message {
   content?: string[];
   position: Position;
   chatId: string;
+  chatOwner?: string;
 }
 
 enum Position {

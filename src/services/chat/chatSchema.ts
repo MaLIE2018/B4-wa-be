@@ -3,15 +3,19 @@ import { Chat, Message } from "./../../types/interfaces";
 
 const { model, Schema } = mongoose;
 
-const MessageSchema = new Schema<Message>({
-  text: { type: String, required: true },
-  userId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-  hidden: [{ type: mongoose.Types.ObjectId, ref: "User" }],
-  content: [{ type: String }],
-  type: { type: String, default: "text" },
-  position: { type: String, enum: ["left", "right"] },
-  date: { type: Date, default: new Date() },
-});
+const MessageSchema = new Schema<Message>(
+  {
+    text: { type: String, required: true },
+    userId: { type: mongoose.Types.ObjectId, ref: "User" },
+    hidden: [{ type: mongoose.Types.ObjectId, ref: "User" }],
+    chatId: { type: String, required: true },
+    content: [{ type: String }],
+    type: { type: String, default: "text" },
+    position: { type: String, enum: ["left", "right"], default: "right" },
+    date: { type: Date, default: new Date() },
+  },
+  { strict: false }
+);
 
 export const ChatSchema = new Schema<Chat>({
   participants: [

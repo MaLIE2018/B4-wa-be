@@ -76,16 +76,22 @@ io.on("connection", (socket) => {
   );
 
   socket.on("send-message", async (message: Message) => {
-    console.log("message:", message);
-    await ChatModel.findByIdAndUpdate(
-      message.chatId,
+    let newMessage;
+    if (message.chatOwner === message.userId) {
+      newMessage = { ...message, position: "right" };
+    } else {
+      newMessage = { ...message, position: "left" };
+    }
+    delete newMessage.chatOwner;
+    const chat = await ChatModel.findByIdAndUpdate(
+      newMessage.chatId,
       {
-        latestMessage: message,
-        $push: { history: { message } },
+        latestMessage: newMessage,
+        $push: { history: newMessage },
       },
-      { useFindAndModify: false }
+      { new: true, useFindAndModify: true }
     );
-    socket.to(message.chatId).emit("receive-message", message);
+    socket.to(message.chatId).emit("receive-message", newMessage);
     // socket.emit("receive-message", nm);
   });
 

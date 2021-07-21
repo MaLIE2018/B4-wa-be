@@ -77,12 +77,19 @@ io.on("connection", (socket) => {
         socket.emit("message-deleted");
     }));
     socket.on("send-message", (message) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("message:", message);
-        yield chatSchema_1.default.findByIdAndUpdate(message.chatId, {
-            latestMessage: message,
-            $push: { history: { message } },
-        }, { useFindAndModify: false });
-        socket.to(message.chatId).emit("receive-message", message);
+        let newMessage;
+        if (message.chatOwner === message.userId) {
+            newMessage = Object.assign(Object.assign({}, message), { position: "right" });
+        }
+        else {
+            newMessage = Object.assign(Object.assign({}, message), { position: "left" });
+        }
+        delete newMessage.chatOwner;
+        const chat = yield chatSchema_1.default.findByIdAndUpdate(newMessage.chatId, {
+            latestMessage: newMessage,
+            $push: { history: newMessage },
+        }, { new: true, useFindAndModify: true });
+        socket.to(message.chatId).emit("receive-message", newMessage);
         // socket.emit("receive-message", nm);
     }));
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
