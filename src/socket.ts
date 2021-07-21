@@ -92,7 +92,11 @@ io.on("connection", (socket) => {
       { new: true, useFindAndModify: true }
     );
     socket.to(message.chatId).emit("receive-message", newMessage);
-    // socket.emit("receive-message", nm);
+    // socket.emit("receive-message", newMessage);
+  });
+
+  socket.on("im-typing", (chatId: string) => {
+    socket.to(chatId).emit("is-typing");
   });
 
   socket.on("offline", async (userId) => {
