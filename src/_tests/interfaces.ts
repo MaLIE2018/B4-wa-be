@@ -1,10 +1,10 @@
-import { TestUser } from "../types/interfaces";
+import { Profile } from "../types/interfaces";
 
 export const inValidData = {
   name: "",
 };
 
-export const userInput4: TestUser = {
+export const userInput4: Profile = {
   profile: {
     firstName: "Max1",
     lastName: "Liebsch1",
@@ -13,7 +13,7 @@ export const userInput4: TestUser = {
   password: "1234",
 };
 
-export let userInput1: TestUser = {
+export let userInput1: Profile = {
   profile: {
     firstName: "Max1",
     lastName: "Liebsch1",
@@ -21,7 +21,7 @@ export let userInput1: TestUser = {
   },
   password: "1234",
 };
-export let userInput2: TestUser = {
+export let userInput2: Profile = {
   profile: {
     firstName: "Max2",
     lastName: "Liebsch2",
@@ -29,7 +29,7 @@ export let userInput2: TestUser = {
   },
   password: "1234",
 };
-export let userInput3: TestUser = {
+export let userInput3: Profile = {
   profile: {
     firstName: "Max3",
     lastName: "Liebsch3",

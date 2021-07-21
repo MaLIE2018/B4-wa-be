@@ -7,21 +7,11 @@ const chatRouter = express.Router();
 //Get all my Chats
 chatRouter.get("/me", async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.user._id).populate({
-      path: "chats.chat",
-      populate: {
-        path: "participants",
-        select: "profile",
-      },
-    });
-
-    //select: { messages: { $slice: ["$messages", -1] } },
-
-    if (user !== null) {
-      res.status(200).send(user.chats);
-    } else {
-      next();
-    }
+    const chats = await ChatModel.find(
+      { participants: req.user._id },
+      { history: 0 }
+    ).populate("participants", { profile: 1 });
+    res.status(200).send(chats);
   } catch (error) {
     next(error);
   }
@@ -36,6 +26,7 @@ chatRouter.post("/", async (req, res, next) => {
       const chat = new ChatModel({
         ...req.body,
         participants: [...req.body.participants, req.user._id],
+        owner: req.user._id,
       });
       await chat.save();
       await Promise.all(
@@ -59,13 +50,11 @@ chatRouter.post("/", async (req, res, next) => {
   }
 });
 
-//Get Chat by ID
+//Get Chat messages by ID
 chatRouter.get("/:id", async (req, res, next) => {
   try {
-    const chat = await ChatModel.findById(req.params.id)
-      .populate("participants", { profile: 1 })
-      .populate("messages");
-    if (chat) res.status(200).send({ chat });
+    const chat = await ChatModel.findById(req.params.id, { history: 1 });
+    if (chat) res.status(200).send(chat);
     else res.status(404).send();
   } catch (error) {
     next(error);

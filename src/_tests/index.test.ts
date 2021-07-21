@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import server from "./../socket";
 import dotenv from "dotenv";
 import { userInput1, userInput2, userInput3 } from "./interfaces";
-import { User } from "../types/interfaces";
+
 import { base64 } from "../lib/helper";
 
 dotenv.config();

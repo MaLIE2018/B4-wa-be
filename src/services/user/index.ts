@@ -6,10 +6,23 @@ import {JWTAuthenticate} from "../../lib/auth/tools";
 const cloudinary = require("cloudinary").v2;
 const {CloudinaryStorage} = require("multer-storage-cloudinary");
 const multer = require("multer");
-import passport from "../../lib/auth/oauth";
+import oauth from "../../lib/auth/oauth";
+import passport from "passport";
 
 const userRouter = express.Router();
 
+userRouter.get("/finduser/:query", async (req, res, next) => {
+  try {
+    console.log("req.params.query:", req.params.query);
+    const users = await UserModel.find({
+      $text: { $search: req.params.query },
+    });
+    if (users) res.status(200).send(users);
+    else res.status(204).send(users);
+  } catch (error) {
+    next(error);
+  }
+});
 userRouter.post(
 	"/register",
 	async (req: Request, res: Response, next: NextFunction) => {

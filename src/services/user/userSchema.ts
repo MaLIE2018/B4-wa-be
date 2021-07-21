@@ -22,7 +22,13 @@ const UserSchema = new Schema<User, UserModel>(
       username: { type: String },
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
-      email: { type: String, required: true, unique: true },
+      socketId: { type: String, default: "" },
+      email: {
+        type: String,
+        index: { type: "text", sparse: true },
+        required: true,
+        unique: true,
+      },
       avatar: { type: String, default: "https://source.unsplash.com/random" },
     },
     password: { type: String },
@@ -61,6 +67,7 @@ UserSchema.static(
       })
       .populate({
         path: "chats.chat",
+        select: { participants: 1, latestMessage: 1 },
         populate: {
           path: "participants",
           select: "profile",
