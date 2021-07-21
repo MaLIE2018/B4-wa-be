@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import errorHandlers from "./lib/errorhandler";
 import { createServer } from "http";
 import routes from "./services";
-import oauth from "./lib/auth/oauth";
 import passport from "passport";
 
 const app = express();
