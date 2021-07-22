@@ -8,7 +8,11 @@ const { instrument } = require("@socket.io/admin-ui");
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.FE_URL!, "https://admin.socket.io/"],
+    origin: [
+      process.env.FE_URL!,
+      process.env.FE_DEV_URL!,
+      "https://admin.socket.io/",
+    ],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,

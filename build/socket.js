@@ -19,7 +19,11 @@ const chatSchema_1 = __importDefault(require("./services/chat/chatSchema"));
 const { instrument } = require("@socket.io/admin-ui");
 const io = new socket_io_1.Server(app_1.default, {
     cors: {
-        origin: [process.env.FE_URL, "https://admin.socket.io/"],
+        origin: [
+            process.env.FE_URL,
+            process.env.FE_DEV_URL,
+            "https://admin.socket.io/",
+        ],
         methods: ["GET", "POST", "DELETE", "PUT"],
         allowedHeaders: ["my-custom-header"],
         credentials: true,
