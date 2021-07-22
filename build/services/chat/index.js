@@ -40,7 +40,7 @@ chatRouter.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             yield chat.save();
             yield Promise.all(chat.participants.map((participantId) => __awaiter(void 0, void 0, void 0, function* () {
                 return yield userSchema_1.default.findByIdAndUpdate(participantId, {
-                    $push: { chats: { chat: chat._id } },
+                    $push: { chats: { caht: chat._id } },
                 }, { useFindAndModify: false });
             })));
             res.status(200).send(chat);

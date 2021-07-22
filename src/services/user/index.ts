@@ -8,11 +8,12 @@ import express, {
 import createError from "http-errors";
 import { basicAuthMiddleware, JWTMiddleWare } from "../../lib/auth/auth";
 import UserModel from "./userSchema";
-import { JWTAuthenticate } from "../../lib/auth/tools";
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const multer = require("multer");
+import {JWTAuthenticate} from "../../lib/auth/tools";
+import { v2 as cloudinary } from "cloudinary"
+import {CloudinaryStorage} from "multer-storage-cloudinary"
+import multer from "multer";
 import passport from "../../lib/auth/oauth";
+import {User} from "../../types/interfaces"
 
 const userRouter = express.Router();
 
@@ -20,7 +21,7 @@ userRouter.get("/finduser/:query", async (req, res, next) => {
   try {
     console.log("req.params.query:", req.params.query);
     const users = await UserModel.find({
-      "profile.email": { $regex: `${req.params.query}` },
+      "profile.firstName": {$regex: `${req.params.query}`},
     });
     if (users) res.status(200).send(users);
     else res.status(204).send(users);
@@ -29,13 +30,6 @@ userRouter.get("/finduser/:query", async (req, res, next) => {
   }
 });
 
-userRouter.get("/me", JWTMiddleWare, async (req: any, res, next) => {
-  try {
-    res.status(200).send(req.user);
-  } catch (error) {
-    next(error);
-  }
-});
 userRouter.post(
   "/register",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -183,6 +177,19 @@ userRouter.get(
     }
   }
 );
+// res.clearCookie("access_token", { httpOnly: true, sameSite: "none", secure:true });
+//         res.clearCookie("refresh_token", { httpOnly: true, sameSite: "none", secure:true });
+
+
+
+userRouter.get("/me", JWTMiddleWare, async (req: any, res, next) => {
+	try {
+		res.status(200).send(req.user);
+	} catch (error) {
+		next(error);
+	}
+});
+
 
 userRouter.get(
   "/me/friends",
@@ -196,6 +203,25 @@ userRouter.get(
     }
   }
 );
+
+userRouter.get(
+	"/me/friends/:query",
+	JWTMiddleWare,
+	async (req: any, res, next) => {
+		try {
+			const user = await UserModel.findById(req.user._id).populate(
+				"friends"
+			);
+			const friend = user?.friends?.filter((user) =>
+				user.profile.firstName.includes(req.params.query)
+			);
+			res.status(200).send(friend);
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
 
 userRouter.post(
   "/me/friends/:userId",
