@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
 import { ChatList, Message, Profile } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
+import { SocketAddress } from "node:net";
 const { instrument } = require("@socket.io/admin-ui");
 
 const io = new Server(server, {
@@ -105,7 +106,7 @@ io.on("connection", (socket) => {
       { "profile.online": false },
       { useFindAndModify: false }
     );
-    socket.emit("loggedOut", "loggedOut");
+    socket.broadcast.emit("loggedOut", "refresh");
     socket.disconnect();
   });
 });

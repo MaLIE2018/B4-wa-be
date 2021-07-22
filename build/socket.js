@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
     });
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
         yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": false }, { useFindAndModify: false });
-        socket.emit("loggedOut", "loggedOut");
+        socket.broadcast.emit("loggedOut", "refresh");
         socket.disconnect();
     }));
 });
