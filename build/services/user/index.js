@@ -20,7 +20,7 @@ const tools_1 = require("../../lib/auth/tools");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
-const passport_1 = __importDefault(require("passport"));
+const oauth_1 = __importDefault(require("../../lib/auth/oauth"));
 const userRouter = express_1.default.Router();
 userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -130,8 +130,8 @@ userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __await
     try {
         if (req.user) {
             const { accessToken, refreshToken } = yield tools_1.JWTAuthenticate(req.user);
-            res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
-            res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true, expire: 604800000 + Date.now() });
+        res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
+res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true, expire: 604800000 + Date.now() });
             res.status(200).send(req.user);
         }
     }
@@ -145,8 +145,8 @@ userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __await
 userRouter.get("/logout", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (req.user) {
-            res.clearCookie("access_token");
-            res.clearCookie("refresh_token");
+           res.clearCookie("access_token", { httpOnly: true, sameSite: "none", secure:true });
+        res.clearCookie("refresh_token", { httpOnly: true, sameSite: "none", secure:true });
             res.status(200).send();
         }
     }
@@ -155,6 +155,8 @@ userRouter.get("/logout", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(vo
         next(error);
     }
 }));
+// res.clearCookie("access_token", { httpOnly: true, sameSite: "none", secure:true });
+//         res.clearCookie("refresh_token", { httpOnly: true, sameSite: "none", secure:true });
 userRouter.get("/me/friends", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         res.status(200).send(req.user.friends);
@@ -183,8 +185,8 @@ userRouter.post("/me/friends/:userId", auth_1.JWTMiddleWare, (req, res, next) =>
         next(error);
     }
 }));
-userRouter.get("/googlelogin", passport_1.default.authenticate("google", { scope: ["profile", "email"] }));
-userRouter.get("/googleRedirect", passport_1.default.authenticate("google"), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+userRouter.get("/googlelogin", oauth_1.default.authenticate("google", { scope: ["profile", "email"] }));
+userRouter.get("/googleRedirect", oauth_1.default.authenticate("google"), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         res.cookie("accessToken", req.user.tokens.accessToken, {
             httpOnly: true,
@@ -192,8 +194,9 @@ userRouter.get("/googleRedirect", passport_1.default.authenticate("google"), (re
         res.cookie("refreshToken", req.user.tokens.refreshToken, {
             httpOnly: true,
         });
-        if (process.env.FE_URL !== undefined)
-            res.status(200).redirect(process.env.FE_URL);
+        res.send("OK");
+        //   if (process.env.FE_URL !== undefined)
+        //     res.status(200).redirect(process.env.FE_URL);
     }
     catch (error) {
         next(error);

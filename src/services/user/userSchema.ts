@@ -30,16 +30,16 @@ const UserSchema = new Schema<User, UserModel>(
         unique: true,
       },
       avatar: { type: String, default: "https://source.unsplash.com/random" },
+      online: { type: Boolean, default: false },
     },
     password: { type: String },
-    online: { type: Boolean, default: false },
     lastSeen: { type: Date },
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     refreshToken: { type: String },
     chats: [ChatsReferenceSchema],
   },
   { timestamps: true }
-)
+);
 
 UserSchema.methods.toJSON = function () {
   const user = this;

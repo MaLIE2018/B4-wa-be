@@ -9,6 +9,7 @@ exports.userInput4 = {
         firstName: "Max1",
         lastName: "Liebsch1",
         email: "max4@max.com",
+        online: false,
     },
     password: "1234",
 };
@@ -17,6 +18,7 @@ exports.userInput1 = {
         firstName: "Max1",
         lastName: "Liebsch1",
         email: "max1@max.com",
+        online: false,
     },
     password: "1234",
 };
@@ -25,6 +27,7 @@ exports.userInput2 = {
         firstName: "Max2",
         lastName: "Liebsch2",
         email: "max@max.com2",
+        online: false,
     },
     password: "1234",
 };
@@ -33,6 +36,7 @@ exports.userInput3 = {
         firstName: "Max3",
         lastName: "Liebsch3",
         email: "max3@max.com",
+        online: false,
     },
     password: "1234",
 };

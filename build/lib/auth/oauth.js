@@ -16,7 +16,6 @@ const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
 const userSchema_1 = __importDefault(require("../../services/user/userSchema"));
 const tools_1 = require("./tools");
-console.log(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_SECRET);
 passport_1.default.use("google", new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_SECRET,
@@ -24,7 +23,9 @@ passport_1.default.use("google", new passport_google_oauth20_1.Strategy({
 }, (accessToken, refreshToken, profile, passportNext) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("profile:", profile);
-        const user = yield userSchema_1.default.findOne({ "profile.email": profile.emails[0].value });
+        const user = yield userSchema_1.default.findOne({
+            "profile.email": profile.emails[0].value,
+        });
         if (user) {
             const tokens = yield tools_1.JWTAuthenticate(user);
             passportNext(null, { user, tokens });

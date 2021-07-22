@@ -61,7 +61,6 @@ chatRouter.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     catch (error) {
         next(error);
     }
-    res.status(200).send();
 }));
 //Delete Chat
 chatRouter.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

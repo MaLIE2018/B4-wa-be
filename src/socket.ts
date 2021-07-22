@@ -3,11 +3,12 @@ import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
 import { ChatList, Message, Profile } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
-import mongoose from "mongoose";
+import { SocketAddress } from "node:net";
+const { instrument } = require("@socket.io/admin-ui");
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.FE_URL,
+    origin: [process.env.FE_URL!, "https://admin.socket.io/"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
@@ -20,7 +21,7 @@ io.on("connection", (socket) => {
     try {
       await UserModel.findByIdAndUpdate(
         userId,
-        { online: true, "profile.socketId": socket.id },
+        { "profile.online": true, "profile.socketId": socket.id },
         { useFindAndModify: false }
       );
     } catch (error) {
@@ -28,18 +29,21 @@ io.on("connection", (socket) => {
     }
     chats.forEach((chat) => {
       socket.join(chat.chat._id!);
+      socket.to(chat.chat._id).emit("loggedIn", "refresh");
     });
-    socket.emit("loggedIn", "connected");
-    console.log(socket.id, socket.rooms);
   });
 
-  socket.on("joinRoom", async (chatId, participants: Profile[]) => {
+  socket.on("participantsJoinRoom", async (chatId, participants: Profile[]) => {
     participants.map((participant) => {
       const socketId = participant.profile.socketId;
       io.of("/").adapter.on("join-room", (chatId, socketId) => {
         console.log(`socket ${socketId} has joined room ${chatId}`);
       });
     });
+  });
+
+  socket.on("joinRoom", async (chatId) => {
+    socket.join(chatId);
   });
 
   socket.on("leaveRoom", async (chatId) => {
@@ -79,28 +83,37 @@ io.on("connection", (socket) => {
     await ChatModel.findByIdAndUpdate(
       chatId,
       {
-        latestMessage: message,
+        latestMessage: { ...message, date: new Date() },
         $push: { history: message },
       },
       { new: true, useFindAndModify: true }
     );
     socket.to(chatId).emit("receive-message", message);
-    // socket.emit("receive-message", message);
+    socket.emit("message-delivered", true);
   });
 
   socket.on("im-typing", (chatId: string) => {
     socket.to(chatId).emit("is-typing");
   });
+  socket.on("i-stopped-typing", (chatId: string) => {
+    socket.to(chatId).emit("stopped-typing");
+  });
 
   socket.on("offline", async (userId) => {
-    await UserModel.findOneAndUpdate(
-      { _id: userId },
-      { online: false },
+    await UserModel.findByIdAndUpdate(
+      userId,
+      { "profile.online": false },
       { useFindAndModify: false }
     );
-    socket.emit("loggedOut", "loggedOut");
+    [...socket.rooms].forEach((room) => {
+      socket.to(room).emit("loggedOut", "refresh");
+    });
     socket.disconnect();
   });
+});
+
+instrument(io, {
+  auth: false,
 });
 
 export default server;

@@ -16,9 +16,10 @@ const app_1 = __importDefault(require("./app"));
 const socket_io_1 = require("socket.io");
 const userSchema_1 = __importDefault(require("./services/user/userSchema"));
 const chatSchema_1 = __importDefault(require("./services/chat/chatSchema"));
+const { instrument } = require("@socket.io/admin-ui");
 const io = new socket_io_1.Server(app_1.default, {
     cors: {
-        origin: process.env.FE_URL,
+        origin: [process.env.FE_URL, "https://admin.socket.io/"],
         methods: ["GET", "POST", "DELETE", "PUT"],
         allowedHeaders: ["my-custom-header"],
         credentials: true,
@@ -28,24 +29,26 @@ const io = new socket_io_1.Server(app_1.default, {
 io.on("connection", (socket) => {
     socket.on("connect-chats", (userId, chats) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            yield userSchema_1.default.findByIdAndUpdate(userId, { online: true, "profile.socketId": socket.id }, { useFindAndModify: false });
+            yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": true, "profile.socketId": socket.id }, { useFindAndModify: false });
         }
         catch (error) {
             console.log(error);
         }
         chats.forEach((chat) => {
             socket.join(chat.chat._id);
+            socket.to(chat.chat._id).emit("loggedIn", "refresh");
         });
-        socket.emit("loggedIn", "connected");
-        console.log(socket.id, socket.rooms);
     }));
-    socket.on("joinRoom", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on("participantsJoinRoom", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
         participants.map((participant) => {
             const socketId = participant.profile.socketId;
             io.of("/").adapter.on("join-room", (chatId, socketId) => {
                 console.log(`socket ${socketId} has joined room ${chatId}`);
             });
         });
+    }));
+    socket.on("joinRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
+        socket.join(chatId);
     }));
     socket.on("leaveRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.leave(chatId);
@@ -78,19 +81,27 @@ io.on("connection", (socket) => {
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
         yield chatSchema_1.default.findByIdAndUpdate(chatId, {
-            latestMessage: message,
+            latestMessage: Object.assign(Object.assign({}, message), { date: new Date() }),
             $push: { history: message },
         }, { new: true, useFindAndModify: true });
         socket.to(chatId).emit("receive-message", message);
-        // socket.emit("receive-message", message);
+        socket.emit("message-delivered", true);
     }));
     socket.on("im-typing", (chatId) => {
         socket.to(chatId).emit("is-typing");
     });
+    socket.on("i-stopped-typing", (chatId) => {
+        socket.to(chatId).emit("stopped-typing");
+    });
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        yield userSchema_1.default.findOneAndUpdate({ _id: userId }, { online: false }, { useFindAndModify: false });
-        socket.emit("loggedOut", "loggedOut");
+        yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": false }, { useFindAndModify: false });
+        [...socket.rooms].forEach((room) => {
+            socket.to(room).emit("loggedOut", "refresh");
+        });
         socket.disconnect();
     }));
+});
+instrument(io, {
+    auth: false,
 });
 exports.default = app_1.default;
