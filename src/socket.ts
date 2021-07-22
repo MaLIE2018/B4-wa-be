@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
       { new: true, useFindAndModify: true }
     );
     socket.to(chatId).emit("receive-message", message);
-    // socket.emit("receive-message", message);
+    socket.emit("message-delivered", true);
   });
 
   socket.on("im-typing", (chatId: string) => {

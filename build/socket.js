@@ -86,7 +86,7 @@ io.on("connection", (socket) => {
             $push: { history: message },
         }, { new: true, useFindAndModify: true });
         socket.to(chatId).emit("receive-message", message);
-        // socket.emit("receive-message", message);
+        socket.emit("message-delivered", true);
     }));
     socket.on("im-typing", (chatId) => {
         socket.to(chatId).emit("is-typing");
