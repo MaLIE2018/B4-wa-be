@@ -96,6 +96,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("im-typing", (chatId: string) => {
+    console.log("chatId:", chatId);
     socket.to(chatId).emit("is-typing", chatId);
   });
   socket.on("i-stopped-typing", (chatId: string) => {
