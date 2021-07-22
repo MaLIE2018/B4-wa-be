@@ -95,6 +95,9 @@ io.on("connection", (socket) => {
   socket.on("im-typing", (chatId: string) => {
     socket.to(chatId).emit("is-typing");
   });
+  socket.on("i-stopped-typing", (chatId: string) => {
+    socket.to(chatId).emit("stopped-typing");
+  });
 
   socket.on("offline", async (userId) => {
     await UserModel.findByIdAndUpdate(

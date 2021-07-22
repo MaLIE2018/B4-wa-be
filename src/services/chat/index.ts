@@ -59,7 +59,6 @@ chatRouter.get("/:id", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-  res.status(200).send();
 });
 
 //Delete Chat

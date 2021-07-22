@@ -91,6 +91,9 @@ io.on("connection", (socket) => {
     socket.on("im-typing", (chatId) => {
         socket.to(chatId).emit("is-typing");
     });
+    socket.on("i-stopped-typing", (chatId) => {
+        socket.to(chatId).emit("stopped-typing");
+    });
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
         yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": false }, { useFindAndModify: false });
         socket.emit("loggedOut", "loggedOut");
