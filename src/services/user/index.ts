@@ -172,8 +172,8 @@ userRouter.get(
     }
   }
 );
-// res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true }); //sameSite: none, secure:true
-// res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true});
+// res.clearCookie("access_token", { httpOnly: true, sameSite: "none", secure:true });
+//         res.clearCookie("refresh_token", { httpOnly: true, sameSite: "none", secure:true });
 userRouter.get(
   "/me/friends",
   JWTMiddleWare,
