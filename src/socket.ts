@@ -29,8 +29,8 @@ io.on("connection", (socket) => {
     }
     chats.forEach((chat) => {
       socket.join(chat.chat._id!);
+      socket.to(chat.chat._id).emit("loggedIn", "refresh");
     });
-    socket.emit("loggedIn", "connected");
   });
 
   socket.on("participantsJoinRoom", async (chatId, participants: Profile[]) => {

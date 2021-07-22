@@ -36,8 +36,8 @@ io.on("connection", (socket) => {
         }
         chats.forEach((chat) => {
             socket.join(chat.chat._id);
+            socket.to(chat.chat._id).emit("loggedIn", "refresh");
         });
-        socket.emit("loggedIn", "connected");
     }));
     socket.on("participantsJoinRoom", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
         participants.map((participant) => {
