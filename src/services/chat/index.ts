@@ -40,7 +40,7 @@ chatRouter.post("/", async (req, res, next) => {
             await UserModel.findByIdAndUpdate(
               participantId,
               {
-                $push: { chats: { caht: chat._id } },
+                $push: { chats: { chat: chat._id } },
               },
               { useFindAndModify: false }
             )
