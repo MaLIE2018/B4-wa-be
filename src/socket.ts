@@ -31,7 +31,6 @@ io.on("connection", (socket) => {
       socket.join(chat.chat._id!);
     });
     socket.emit("loggedIn", "connected");
-    console.log(socket.id, socket.rooms);
   });
 
   socket.on("participantsJoinRoom", async (chatId, participants: Profile[]) => {
@@ -106,7 +105,9 @@ io.on("connection", (socket) => {
       { "profile.online": false },
       { useFindAndModify: false }
     );
-    socket.broadcast.emit("loggedOut", "refresh");
+    [...socket.rooms].forEach((room) => {
+      socket.to(room).emit("loggedOut", "refresh");
+    });
     socket.disconnect();
   });
 });

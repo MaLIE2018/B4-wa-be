@@ -38,7 +38,6 @@ io.on("connection", (socket) => {
             socket.join(chat.chat._id);
         });
         socket.emit("loggedIn", "connected");
-        console.log(socket.id, socket.rooms);
     }));
     socket.on("participantsJoinRoom", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
         participants.map((participant) => {
@@ -96,7 +95,9 @@ io.on("connection", (socket) => {
     });
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
         yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": false }, { useFindAndModify: false });
-        socket.broadcast.emit("loggedOut", "refresh");
+        [...socket.rooms].forEach((room) => {
+            socket.to(room).emit("loggedOut", "refresh");
+        });
         socket.disconnect();
     }));
 });

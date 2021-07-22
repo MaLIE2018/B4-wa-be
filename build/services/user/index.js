@@ -130,7 +130,7 @@ userRouter.get("/login", auth_1.basicAuthMiddleware, (req, res, next) => __await
     try {
         if (req.user) {
             const { accessToken, refreshToken } = yield tools_1.JWTAuthenticate(req.user);
-          res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
+        res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
 res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true, expire: 604800000 + Date.now() });
             res.status(200).send(req.user);
         }
@@ -145,8 +145,8 @@ res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", se
 userRouter.get("/logout", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (req.user) {
-            res.clearCookie("access_token",{ httpOnly: true, sameSite: "none", secure:true });
-            res.clearCookie("refresh_token", { httpOnly: true, sameSite: "none", secure:true});
+         res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true }); //sameSite: none, secure:true
+res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true});
             res.status(200).send();
         }
     }
@@ -155,7 +155,6 @@ userRouter.get("/logout", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(vo
         next(error);
     }
 }));
-
 // res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true }); //sameSite: none, secure:true
 // res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true});
 userRouter.get("/me/friends", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
