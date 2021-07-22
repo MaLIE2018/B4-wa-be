@@ -82,7 +82,7 @@ io.on("connection", (socket) => {
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
         yield chatSchema_1.default.findByIdAndUpdate(chatId, {
-            latestMessage: message,
+            latestMessage: Object.assign(Object.assign({}, message), { date: new Date() }),
             $push: { history: message },
         }, { new: true, useFindAndModify: true });
         socket.to(chatId).emit("receive-message", message);

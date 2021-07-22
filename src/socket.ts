@@ -83,7 +83,7 @@ io.on("connection", (socket) => {
     await ChatModel.findByIdAndUpdate(
       chatId,
       {
-        latestMessage: message,
+        latestMessage: { ...message, date: new Date() },
         $push: { history: message },
       },
       { new: true, useFindAndModify: true }
