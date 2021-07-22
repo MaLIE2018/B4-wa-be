@@ -34,7 +34,8 @@ export const JWTAuthenticate = async (user: User) => {
   const refreshToken = await generateRefreshToken({ _id: user._id });
 
   user.refreshToken = refreshToken;
-
+  user.profile.online = true;
+  user.profile.lastSeen = new Date();
   await user.save();
   return { accessToken, refreshToken };
 };

@@ -19,34 +19,37 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   socket.on("connect-chats", async (userId, chats: ChatList[]) => {
     try {
-      await UserModel.findByIdAndUpdate(
-        userId,
-        { "profile.online": true, "profile.socketId": socket.id },
-        { useFindAndModify: false }
-      );
+      await UserModel.findByIdAndUpdate(userId, {
+        "profile.socketId": socket.id,
+      });
     } catch (error) {
       console.log(error);
     }
     chats.forEach((chat) => {
       socket.join(chat.chat._id!);
-      socket.to(chat.chat._id).emit("loggedIn", "refresh");
+    });
+    chats.forEach((chat) => {
+      socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
     });
   });
 
-  socket.on("participantsJoinRoom", async (chatId, participants: Profile[]) => {
-    participants.map((participant) => {
-      const socketId = participant.profile.socketId;
-      io.of("/").adapter.on("join-room", (chatId, socketId) => {
-        console.log(`socket ${socketId} has joined room ${chatId}`);
+  socket.on(
+    "participants-Join-room",
+    async (chatId, participants: Profile[]) => {
+      participants.map((participant) => {
+        const socketId = participant.profile.socketId;
+        io.of("/").adapter.on("join-room", (chatId, socketId) => {
+          console.log(`socket ${socketId} has joined room ${chatId}`);
+        });
       });
-    });
-  });
+    }
+  );
 
-  socket.on("joinRoom", async (chatId) => {
+  socket.on("join-room", async (chatId) => {
     socket.join(chatId);
   });
 
-  socket.on("leaveRoom", async (chatId) => {
+  socket.on("leave-room", async (chatId) => {
     socket.leave(chatId);
   });
 
@@ -74,7 +77,7 @@ io.on("connection", (socket) => {
       } catch (error) {
         console.log(error);
       }
-      socket.to(chatId).emit("message-deleted-for-all");
+      socket.to(chatId).emit("message-deleted-for-all", chatId);
       socket.emit("message-deleted");
     }
   );
@@ -88,27 +91,21 @@ io.on("connection", (socket) => {
       },
       { new: true, useFindAndModify: true }
     );
-    socket.to(chatId).emit("receive-message", message);
+    socket.to(chatId).emit("receive-message", message, chatId);
     socket.emit("message-delivered", true);
   });
 
   socket.on("im-typing", (chatId: string) => {
-    socket.to(chatId).emit("is-typing");
+    socket.to(chatId).emit("is-typing", chatId);
   });
   socket.on("i-stopped-typing", (chatId: string) => {
-    socket.to(chatId).emit("stopped-typing");
+    socket.to(chatId).emit("stopped-typing", chatId);
   });
 
-  socket.on("offline", async (userId) => {
-    await UserModel.findByIdAndUpdate(
-      userId,
-      { "profile.online": false },
-      { useFindAndModify: false }
-    );
+  socket.on("offline", (userId) => {
     [...socket.rooms].forEach((room) => {
-      socket.to(room).emit("loggedOut", "refresh");
+      socket.to(room).emit("logged-out", room);
     });
-    socket.disconnect();
   });
 });
 

@@ -29,17 +29,21 @@ const io = new socket_io_1.Server(app_1.default, {
 io.on("connection", (socket) => {
     socket.on("connect-chats", (userId, chats) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": true, "profile.socketId": socket.id }, { useFindAndModify: false });
+            yield userSchema_1.default.findByIdAndUpdate(userId, {
+                "profile.socketId": socket.id,
+            });
         }
         catch (error) {
             console.log(error);
         }
         chats.forEach((chat) => {
             socket.join(chat.chat._id);
-            socket.to(chat.chat._id).emit("loggedIn", "refresh");
+        });
+        chats.forEach((chat) => {
+            socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
         });
     }));
-    socket.on("participantsJoinRoom", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on("participants-Join-room", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
         participants.map((participant) => {
             const socketId = participant.profile.socketId;
             io.of("/").adapter.on("join-room", (chatId, socketId) => {
@@ -47,10 +51,10 @@ io.on("connection", (socket) => {
             });
         });
     }));
-    socket.on("joinRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on("join-room", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.join(chatId);
     }));
-    socket.on("leaveRoom", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on("leave-room", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.leave(chatId);
     }));
     socket.on("delete-message-for-me", (messageId, userId, chatId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -76,7 +80,7 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error);
         }
-        socket.to(chatId).emit("message-deleted-for-all");
+        socket.to(chatId).emit("message-deleted-for-all", chatId);
         socket.emit("message-deleted");
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -84,22 +88,20 @@ io.on("connection", (socket) => {
             latestMessage: Object.assign(Object.assign({}, message), { date: new Date() }),
             $push: { history: message },
         }, { new: true, useFindAndModify: true });
-        socket.to(chatId).emit("receive-message", message);
+        socket.to(chatId).emit("receive-message", message, chatId);
         socket.emit("message-delivered", true);
     }));
     socket.on("im-typing", (chatId) => {
-        socket.to(chatId).emit("is-typing");
+        socket.to(chatId).emit("is-typing", chatId);
     });
     socket.on("i-stopped-typing", (chatId) => {
-        socket.to(chatId).emit("stopped-typing");
+        socket.to(chatId).emit("stopped-typing", chatId);
     });
-    socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": false }, { useFindAndModify: false });
+    socket.on("offline", (userId) => {
         [...socket.rooms].forEach((room) => {
-            socket.to(room).emit("loggedOut", "refresh");
+            socket.to(room).emit("logged-out", room);
         });
-        socket.disconnect();
-    }));
+    });
 });
 instrument(io, {
     auth: false,

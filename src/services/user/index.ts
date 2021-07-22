@@ -1,4 +1,10 @@
-import express, { Request, Response, NextFunction, request } from "express";
+import express, {
+  Request,
+  Response,
+  NextFunction,
+  request,
+  CookieOptions,
+} from "express";
 import createError from "http-errors";
 import { basicAuthMiddleware, JWTMiddleWare } from "../../lib/auth/auth";
 import UserModel from "./userSchema";
@@ -129,6 +135,11 @@ userRouter.delete(
   }
 );
 
+const cookieOptions: CookieOptions =
+  process.env.NODE_ENV === "development"
+    ? { httpOnly: true }
+    : { httpOnly: true, sameSite: "none", secure: true };
+
 userRouter.get(
   "/login",
   basicAuthMiddleware,
@@ -136,8 +147,8 @@ userRouter.get(
     try {
       if (req.user) {
         const { accessToken, refreshToken } = await JWTAuthenticate(req.user);
-        res.cookie("access_token", accessToken, { httpOnly: true }); //sameSite: none, secure:true
-        res.cookie("refresh_token", refreshToken, { httpOnly: true });
+        res.cookie("access_token", accessToken, cookieOptions); //sameSite: none, secure:true
+        res.cookie("refresh_token", refreshToken, cookieOptions);
         res.status(200).send(req.user);
       }
     } catch (error) {
@@ -147,17 +158,17 @@ userRouter.get(
   }
 );
 
-// res.cookie("access_token", accessToken, { httpOnly: true, sameSite: "none", secure:true, expire: 1800000 + Date.now() }); //sameSite: none, secure:true
-// res.cookie("refresh_token", refreshToken, { httpOnly: true, sameSite: "none", secure:true, expire: 604800000 + Date.now() });
-
 userRouter.get(
   "/logout",
   JWTMiddleWare,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (req.user) {
-        res.clearCookie("access_token");
-        res.clearCookie("refresh_token");
+        req.user.profile.online = false;
+        req.user.profile.lastSeen = new Date();
+        req.user.save();
+        res.clearCookie("access_token", cookieOptions);
+        res.clearCookie("refresh_token", cookieOptions);
         res.status(200).send();
       }
     } catch (error) {
