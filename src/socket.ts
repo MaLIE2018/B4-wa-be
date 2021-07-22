@@ -25,12 +25,14 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.log(error);
     }
-    chats.forEach((chat) => {
-      socket.join(chat.chat._id!);
-    });
-    chats.forEach((chat) => {
-      socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
-    });
+    if (chats.length > 0) {
+      chats.forEach((chat) => {
+        socket.join(chat.chat._id!);
+      });
+      chats.forEach((chat) => {
+        socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+      });
+    }
   });
 
   socket.on(

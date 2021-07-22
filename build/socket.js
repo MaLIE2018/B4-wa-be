@@ -36,12 +36,14 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error);
         }
-        chats.forEach((chat) => {
-            socket.join(chat.chat._id);
-        });
-        chats.forEach((chat) => {
-            socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
-        });
+        if (chats.length > 0) {
+            chats.forEach((chat) => {
+                socket.join(chat.chat._id);
+            });
+            chats.forEach((chat) => {
+                socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+            });
+        }
     }));
     socket.on("participants-Join-room", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
         participants.map((participant) => {
@@ -92,6 +94,7 @@ io.on("connection", (socket) => {
         socket.emit("message-delivered", true);
     }));
     socket.on("im-typing", (chatId) => {
+        console.log("chatId:", chatId);
         socket.to(chatId).emit("is-typing", chatId);
     });
     socket.on("i-stopped-typing", (chatId) => {
