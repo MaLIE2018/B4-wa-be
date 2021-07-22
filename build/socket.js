@@ -40,10 +40,8 @@ io.on("connection", (socket) => {
             socket.join(chat.chat._id);
         });
         chats.forEach((chat) => {
-            socket.to(chat.chat._id).emit("logged-in", "refresh");
+            socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
         });
-        console.log(socket.id, socket.rooms);
-        socket.emit("yourID", socket.id);
     }));
     socket.on("participants-Join-room", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
         participants.map((participant) => {
@@ -82,7 +80,7 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error);
         }
-        socket.to(chatId).emit("message-deleted-for-all");
+        socket.to(chatId).emit("message-deleted-for-all", chatId);
         socket.emit("message-deleted");
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -90,18 +88,18 @@ io.on("connection", (socket) => {
             latestMessage: Object.assign(Object.assign({}, message), { date: new Date() }),
             $push: { history: message },
         }, { new: true, useFindAndModify: true });
-        socket.to(chatId).emit("receive-message", message);
+        socket.to(chatId).emit("receive-message", message, chatId);
         socket.emit("message-delivered", true);
     }));
     socket.on("im-typing", (chatId) => {
-        socket.to(chatId).emit("is-typing");
+        socket.to(chatId).emit("is-typing", chatId);
     });
     socket.on("i-stopped-typing", (chatId) => {
-        socket.to(chatId).emit("stopped-typing");
+        socket.to(chatId).emit("stopped-typing", chatId);
     });
     socket.on("offline", (userId) => {
         [...socket.rooms].forEach((room) => {
-            socket.to(room).emit("logged-out", "logOut-refresh");
+            socket.to(room).emit("logged-out", room);
         });
     });
 });

@@ -1,7 +1,12 @@
-import express from "express";
+import express, { NextFunction, Response } from "express";
+import { JWTMiddleWare } from "../../lib/auth/auth";
 import { ChatList } from "../../types/interfaces";
 import ChatModel from "../chat/chatSchema";
 import UserModel from "../user/userSchema";
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
+
 const chatRouter = express.Router();
 
 //Get all my Chats
@@ -115,6 +120,38 @@ chatRouter.delete(
       res.status(204).send();
     } catch (error) {
       next(error);
+    }
+  }
+);
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECTRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "test",
+  },
+});
+
+const upload = multer({ storage: storage }).single("img");
+
+chatRouter.put(
+  "/upload",
+  JWTMiddleWare,
+  upload,
+  async (req: any, res: Response, next: NextFunction) => {
+    try {
+      // req.user.profile.avatar = req.file.path;
+      await req.user.save();
+      res.status(200).send("operation is done successfully");
+    } catch (error: any) {
+      console.log(error);
+      next(error);
+      // next(createError(500, {message: error.message}));
     }
   }
 );
