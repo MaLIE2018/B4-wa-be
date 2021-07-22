@@ -19,34 +19,39 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   socket.on("connect-chats", async (userId, chats: ChatList[]) => {
     try {
-      await UserModel.findByIdAndUpdate(
-        userId,
-        { "profile.socketId": socket.id },
-        { useFindAndModify: false }
-      );
+      await UserModel.findByIdAndUpdate(userId, {
+        "profile.socketId": socket.id,
+      });
     } catch (error) {
       console.log(error);
     }
     chats.forEach((chat) => {
       socket.join(chat.chat._id!);
-      socket.to(chat.chat._id).emit("loggedIn", "refresh");
     });
+    chats.forEach((chat) => {
+      socket.to(chat.chat._id).emit("logged-in", "refresh");
+    });
+    console.log(socket.id, socket.rooms);
+    socket.emit("yourID", socket.id);
   });
 
-  socket.on("participantsJoinRoom", async (chatId, participants: Profile[]) => {
-    participants.map((participant) => {
-      const socketId = participant.profile.socketId;
-      io.of("/").adapter.on("join-room", (chatId, socketId) => {
-        console.log(`socket ${socketId} has joined room ${chatId}`);
+  socket.on(
+    "participants-Join-room",
+    async (chatId, participants: Profile[]) => {
+      participants.map((participant) => {
+        const socketId = participant.profile.socketId;
+        io.of("/").adapter.on("join-room", (chatId, socketId) => {
+          console.log(`socket ${socketId} has joined room ${chatId}`);
+        });
       });
-    });
-  });
+    }
+  );
 
-  socket.on("joinRoom", async (chatId) => {
+  socket.on("join-room", async (chatId) => {
     socket.join(chatId);
   });
 
-  socket.on("leaveRoom", async (chatId) => {
+  socket.on("leave-room", async (chatId) => {
     socket.leave(chatId);
   });
 
@@ -99,10 +104,9 @@ io.on("connection", (socket) => {
     socket.to(chatId).emit("stopped-typing");
   });
 
-  socket.on("offline", async (userId) => {
+  socket.on("offline", (userId) => {
     [...socket.rooms].forEach((room) => {
-      socket.to(room).emit("loggedOut", "refresh");
-      socket.leave(room);
+      socket.to(room).emit("logged-out", "logOut-refresh");
     });
   });
 });

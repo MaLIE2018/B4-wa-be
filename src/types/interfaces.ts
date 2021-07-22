@@ -16,6 +16,7 @@ export interface Profile {
     googleId?: string;
     socketId?: string;
     online: boolean;
+    lastSeen?: Date;
   };
   password?: string;
 }
@@ -23,7 +24,6 @@ export interface Profile {
 export interface User extends Profile {
   _id?: string;
   password?: string;
-  lastSeen?: string;
   friends?: User[];
   chats: { hidden: boolean; chatId: string }[];
   refreshToken?: string;
@@ -39,6 +39,7 @@ export interface TestUser {
     avatar?: string;
     socketId?: string;
     online: boolean;
+    lastSeen?: Date;
   };
   password?: string;
 }

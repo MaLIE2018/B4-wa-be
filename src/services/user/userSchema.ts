@@ -23,6 +23,7 @@ const UserSchema = new Schema<User, UserModel>(
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
       socketId: { type: String, default: "" },
+      lastSeen: { type: Date },
       email: {
         type: String,
         index: { type: "text", sparse: true },
@@ -33,7 +34,7 @@ const UserSchema = new Schema<User, UserModel>(
       online: { type: Boolean, default: false },
     },
     password: { type: String },
-    lastSeen: { type: Date },
+
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     refreshToken: { type: String },
     chats: [ChatsReferenceSchema],
