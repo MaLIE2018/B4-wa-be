@@ -26,7 +26,6 @@ const UserSchema = new Schema<User, UserModel>(
       lastSeen: { type: Date },
       email: {
         type: String,
-        index: { type: "text", sparse: true },
         required: true,
         unique: true,
       },
@@ -39,7 +38,7 @@ const UserSchema = new Schema<User, UserModel>(
     refreshToken: { type: String },
     chats: [ChatsReferenceSchema],
   },
-  { timestamps: true }
+  { timestamps: true, strict: false }
 );
 
 UserSchema.methods.toJSON = function () {

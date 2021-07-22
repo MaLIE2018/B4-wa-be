@@ -14,6 +14,7 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 import passport from "../../lib/auth/oauth";
 import { User } from "../../types/interfaces";
+import { isNamespaceExportDeclaration } from "typescript";
 
 const userRouter = express.Router();
 
@@ -34,16 +35,22 @@ userRouter.post(
   "/register",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const newUser = await new UserModel(req.body).save();
+      const newUser = new UserModel(req.body);
+      await newUser.save();
       res.status(201).send(newUser);
     } catch (error: any) {
       if (error.name === "MongoError")
-        res.send({
-          error: error.keyValue,
-          reason: "Duplicated key",
-          advice: "Change the key value",
-        });
-      else if (error.name === "ValidationError") res.send(error.message);
+        next(
+          createError(400, {
+            message: {
+              error: error.keyValue,
+              reason: "Duplicated key",
+              advice: "Change the key value",
+            },
+          })
+        );
+      else if (error.name === "ValidationError")
+        next(createError(400, { message: "ValidationError" }));
       else next(createError(500, { message: error.message }));
     }
   }
