@@ -17,29 +17,21 @@ const http_errors_1 = __importDefault(require("http-errors"));
 const auth_1 = require("../../lib/auth/auth");
 const userSchema_1 = __importDefault(require("./userSchema"));
 const tools_1 = require("../../lib/auth/tools");
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const multer = require("multer");
+const cloudinary_1 = require("cloudinary");
+const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
+const multer_1 = __importDefault(require("multer"));
 const oauth_1 = __importDefault(require("../../lib/auth/oauth"));
 const userRouter = express_1.default.Router();
 userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("req.params.query:", req.params.query);
         const users = yield userSchema_1.default.find({
-            "profile.email": { $regex: `${req.params.query}` },
+            "profile.firstName": { $regex: `${req.params.query}` },
         });
         if (users)
             res.status(200).send(users);
         else
             res.status(204).send(users);
-    }
-    catch (error) {
-        next(error);
-    }
-}));
-userRouter.get("/me", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        res.status(200).send(req.user);
     }
     catch (error) {
         next(error);
@@ -81,18 +73,18 @@ userRouter.put("/update", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(vo
             next(http_errors_1.default(500, { message: error.message }));
     }
 }));
-cloudinary.config({
+cloudinary_1.v2.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.API_KEY,
     api_secret: process.env.API_SECTRET,
 });
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
+const storage = new multer_storage_cloudinary_1.CloudinaryStorage({
+    cloudinary: cloudinary_1.v2,
     params: {
         folder: "test",
     },
 });
-const upload = multer({ storage: storage }).single("img");
+const upload = multer_1.default({ storage: storage }).single("img");
 userRouter.put("/profile", auth_1.JWTMiddleWare, upload, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         req.user.profile.avatar = req.file.path;
@@ -159,12 +151,33 @@ userRouter.get("/logout", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(vo
         next(error);
     }
 }));
+// res.clearCookie("access_token", { httpOnly: true, sameSite: "none", secure:true });
+//         res.clearCookie("refresh_token", { httpOnly: true, sameSite: "none", secure:true });
+userRouter.get("/me", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.status(200).send(req.user);
+    }
+    catch (error) {
+        next(error);
+    }
+}));
 userRouter.get("/me/friends", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         res.status(200).send(req.user.friends);
     }
     catch (error) {
         console.log(error);
+        next(error);
+    }
+}));
+userRouter.get("/me/friends/:query", auth_1.JWTMiddleWare, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const user = yield userSchema_1.default.findById(req.user._id).populate("friends");
+        const friend = (_a = user === null || user === void 0 ? void 0 : user.friends) === null || _a === void 0 ? void 0 : _a.filter((user) => user.profile.firstName.includes(req.params.query));
+        res.status(200).send(friend);
+    }
+    catch (error) {
         next(error);
     }
 }));
