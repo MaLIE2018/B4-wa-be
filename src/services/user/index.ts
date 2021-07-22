@@ -3,9 +3,9 @@ import createError from "http-errors";
 import {basicAuthMiddleware, JWTMiddleWare} from "../../lib/auth/auth";
 import UserModel from "./userSchema";
 import {JWTAuthenticate} from "../../lib/auth/tools";
-const cloudinary = require("cloudinary").v2;
-const {CloudinaryStorage} = require("multer-storage-cloudinary");
-const multer = require("multer");
+import { v2 as cloudinary } from "cloudinary"
+import {CloudinaryStorage} from "multer-storage-cloudinary"
+import multer from "multer";
 import passport from "../../lib/auth/oauth";
 
 const userRouter = express.Router();
@@ -14,7 +14,7 @@ userRouter.get("/finduser/:query", async (req, res, next) => {
   try {
     console.log("req.params.query:", req.params.query);
     const users = await UserModel.find({
-      "profile.email": { $regex: `${req.params.query}` },
+      "profile.firstName": { $regex: `${req.params.query}` },
     });
     if (users) res.status(200).send(users);
     else res.status(204).send(users);
