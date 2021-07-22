@@ -21,7 +21,7 @@ io.on("connection", (socket) => {
     try {
       await UserModel.findByIdAndUpdate(
         userId,
-        { "profile.online": true, "profile.socketId": socket.id },
+        { "profile.socketId": socket.id },
         { useFindAndModify: false }
       );
     } catch (error) {
@@ -100,15 +100,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("offline", async (userId) => {
-    await UserModel.findByIdAndUpdate(
-      userId,
-      { "profile.online": false },
-      { useFindAndModify: false }
-    );
     [...socket.rooms].forEach((room) => {
       socket.to(room).emit("loggedOut", "refresh");
+      socket.leave(room);
     });
-    socket.disconnect();
   });
 });
 

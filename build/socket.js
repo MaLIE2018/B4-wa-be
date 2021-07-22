@@ -29,7 +29,7 @@ const io = new socket_io_1.Server(app_1.default, {
 io.on("connection", (socket) => {
     socket.on("connect-chats", (userId, chats) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": true, "profile.socketId": socket.id }, { useFindAndModify: false });
+            yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.socketId": socket.id }, { useFindAndModify: false });
         }
         catch (error) {
             console.log(error);
@@ -94,11 +94,10 @@ io.on("connection", (socket) => {
         socket.to(chatId).emit("stopped-typing");
     });
     socket.on("offline", (userId) => __awaiter(void 0, void 0, void 0, function* () {
-        yield userSchema_1.default.findByIdAndUpdate(userId, { "profile.online": false }, { useFindAndModify: false });
         [...socket.rooms].forEach((room) => {
             socket.to(room).emit("loggedOut", "refresh");
+            socket.leave(room);
         });
-        socket.disconnect();
     }));
 });
 instrument(io, {

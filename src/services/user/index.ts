@@ -162,6 +162,8 @@ userRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (req.user) {
+        req.user.profile.online = false;
+        req.user.save();
         res.clearCookie("access_token");
         res.clearCookie("refresh_token");
         res.status(200).send();

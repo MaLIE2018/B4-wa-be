@@ -28,6 +28,7 @@ const JWTAuthenticate = (user) => __awaiter(void 0, void 0, void 0, function* ()
     const accessToken = yield generateAccessToken({ _id: user._id });
     const refreshToken = yield generateRefreshToken({ _id: user._id });
     user.refreshToken = refreshToken;
+    user.profile.online = true;
     yield user.save();
     return { accessToken, refreshToken };
 });
