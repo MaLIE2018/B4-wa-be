@@ -99,11 +99,11 @@ io.on("connection", (socket) => {
       chatId,
       {
         latestMessage: newMessage,
-        $push: { history: message },
+        $push: { history: newMessage },
       },
       { new: true, useFindAndModify: true }
     );
-    socket.to(chatId).emit("receive-message", message, chatId);
+    socket.to(chatId).emit("receive-message", newMessage, chatId);
     socket.emit("message-delivered", newMessage.date, chatId);
   });
 

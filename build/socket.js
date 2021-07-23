@@ -101,9 +101,9 @@ io.on("connection", (socket) => {
         const newMessage = Object.assign(Object.assign({}, message), { status: "received" });
         yield chatSchema_1.default.findByIdAndUpdate(chatId, {
             latestMessage: newMessage,
-            $push: { history: message },
+            $push: { history: newMessage },
         }, { new: true, useFindAndModify: true });
-        socket.to(chatId).emit("receive-message", message, chatId);
+        socket.to(chatId).emit("receive-message", newMessage, chatId);
         socket.emit("message-delivered", newMessage.date, chatId);
     }));
     socket.on("im-typing", (chatId) => {
