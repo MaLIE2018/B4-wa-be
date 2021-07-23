@@ -9,8 +9,13 @@ import createError from "http-errors";
 
 const app = express();
 
-const originsURLS = [process.env.FE_URL, process.env.FE_DEV_URL];
-
+const originsURLS = [
+	process.env.FE_URL,
+	process.env.FE_DEV_URL,
+	process.env.FE_GOOGLE_URL,
+	process.env.FE_GOOGLE_REDIRECT_URL,
+];
+// http://localhost:3001/users/googleRedirect
 const corsOptions = {
   origin: function (origin: any, next: any) {
     if (originsURLS.indexOf(origin) !== -1) {

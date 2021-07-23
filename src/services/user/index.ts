@@ -14,7 +14,6 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 import passport from "../../lib/auth/oauth";
 import { User } from "../../types/interfaces";
-import { isNamespaceExportDeclaration } from "typescript";
 
 const userRouter = express.Router();
 
@@ -262,9 +261,10 @@ userRouter.get(
       res.cookie("refreshToken", req.user.tokens.refreshToken, {
         httpOnly: true,
       });
-      res.send("OK");
-      //   if (process.env.FE_URL !== undefined)
-      //     res.status(200).redirect(process.env.FE_URL);
+      // res.send("OK");
+      if (process.env.FE_URL !== undefined) res.status(200).redirect(process.env.FE_URL_WHATSUP!);
+      else res.status(200).redirect("https://whatsappclone-mu.vercel.app/home");
+      
     } catch (error) {
       next(error);
     }
