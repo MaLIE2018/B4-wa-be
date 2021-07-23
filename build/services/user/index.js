@@ -208,7 +208,6 @@ userRouter.get("/googleRedirect", oauth_1.default.authenticate("google"), (req, 
     try {
         res.cookie("access_token", req.user.tokens.accessToken, cookieOptions);
         res.cookie("refresh_token", req.user.tokens.refreshToken, cookieOptions);
-        // res.send("OK");
         if (process.env.FE_URL !== undefined)
             res.status(200).redirect(process.env.FE_URL_WHATSUP);
         else

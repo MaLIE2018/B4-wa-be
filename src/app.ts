@@ -18,6 +18,7 @@ const originsURLS = [
 const corsOptions = {
   origin: function (origin: any, next: any) {
     if (originsURLS.indexOf(origin) !== -1) {
+      console.log("origin:", origin);
       next(null, true);
     } else {
       next(createError(403, { message: "Check your cors settings!" }));
