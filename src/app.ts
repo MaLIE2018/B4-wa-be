@@ -9,27 +9,27 @@ import createError from "http-errors";
 
 const app = express();
 
-const originsURLS = [
-  process.env.FE_URL,
-  process.env.FE_DEV_URL,
-  process.env.FE_GOOGLE_URL,
-  process.env.FE_GOOGLE_REDIRECT_URL,
-  undefined,
-];
-const corsOptions = {
-  origin: function (origin: any, next: any) {
-    if (originsURLS.indexOf(origin) !== -1) {
-      console.log("origin:", origin);
-      next(null, true);
-    } else {
-      console.log("origin403:", origin);
-      next(createError(403, { message: "Check your cors settings!" }));
-    }
-  },
-  credentials: true,
-};
+// const originsURLS = [
+//   process.env.FE_URL,
+//   process.env.FE_DEV_URL,
+//   process.env.FE_GOOGLE_URL,
+//   process.env.FE_GOOGLE_REDIRECT_URL,
+//   undefined,
+// ];
+// const corsOptions = {
+//   origin: function (origin: any, next: any) {
+//     if (originsURLS.indexOf(origin) !== -1) {
+//       console.log("origin:", origin);
+//       next(null, true);
+//     } else {
+//       console.log("origin403:", origin);
+//       next(createError(403, { message: "Check your cors settings!" }));
+//     }
+//   },
+//   credentials: true,
+// };
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
