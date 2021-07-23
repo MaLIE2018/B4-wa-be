@@ -8,12 +8,13 @@ import express, {
 import createError from "http-errors";
 import { basicAuthMiddleware, JWTMiddleWare } from "../../lib/auth/auth";
 import UserModel from "./userSchema";
-import {JWTAuthenticate} from "../../lib/auth/tools";
-import { v2 as cloudinary } from "cloudinary"
-import {CloudinaryStorage} from "multer-storage-cloudinary"
+import { JWTAuthenticate } from "../../lib/auth/tools";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 import passport from "../../lib/auth/oauth";
-import {User} from "../../types/interfaces"
+import { User } from "../../types/interfaces";
+import { isNamespaceExportDeclaration } from "typescript";
 
 const userRouter = express.Router();
 
@@ -21,7 +22,7 @@ userRouter.get("/finduser/:query", async (req, res, next) => {
   try {
     console.log("req.params.query:", req.params.query);
     const users = await UserModel.find({
-      "profile.firstName": {$regex: `${req.params.query}`},
+      "profile.firstName": { $regex: `${req.params.query}` },
     });
     if (users) res.status(200).send(users);
     else res.status(204).send(users);
@@ -34,16 +35,22 @@ userRouter.post(
   "/register",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const newUser = await new UserModel(req.body).save();
+      const newUser = new UserModel(req.body);
+      await newUser.save();
       res.status(201).send(newUser);
     } catch (error: any) {
       if (error.name === "MongoError")
-        res.send({
-          error: error.keyValue,
-          reason: "Duplicated key",
-          advice: "Change the key value",
-        });
-      else if (error.name === "ValidationError") res.send(error.message);
+        next(
+          createError(400, {
+            message: {
+              error: error.keyValue,
+              reason: "Duplicated key",
+              advice: "Change the key value",
+            },
+          })
+        );
+      else if (error.name === "ValidationError")
+        next(createError(400, { message: "ValidationError" }));
       else next(createError(500, { message: error.message }));
     }
   }
@@ -180,16 +187,13 @@ userRouter.get(
 // res.clearCookie("access_token", { httpOnly: true, sameSite: "none", secure:true });
 //         res.clearCookie("refresh_token", { httpOnly: true, sameSite: "none", secure:true });
 
-
-
 userRouter.get("/me", JWTMiddleWare, async (req: any, res, next) => {
-	try {
-		res.status(200).send(req.user);
-	} catch (error) {
-		next(error);
-	}
+  try {
+    res.status(200).send(req.user);
+  } catch (error) {
+    next(error);
+  }
 });
-
 
 userRouter.get(
   "/me/friends",
@@ -205,23 +209,20 @@ userRouter.get(
 );
 
 userRouter.get(
-	"/me/friends/:query",
-	JWTMiddleWare,
-	async (req: any, res, next) => {
-		try {
-			const user = await UserModel.findById(req.user._id).populate(
-				"friends"
-			);
-			const friend = user?.friends?.filter((user) =>
-				user.profile.firstName.includes(req.params.query)
-			);
-			res.status(200).send(friend);
-		} catch (error) {
-			next(error);
-		}
-	}
+  "/me/friends/:query",
+  JWTMiddleWare,
+  async (req: any, res, next) => {
+    try {
+      const user = await UserModel.findById(req.user._id).populate("friends");
+      const friend = user?.friends?.filter((user) =>
+        user.profile.firstName.includes(req.params.query)
+      );
+      res.status(200).send(friend);
+    } catch (error) {
+      next(error);
+    }
+  }
 );
-
 
 userRouter.post(
   "/me/friends/:userId",

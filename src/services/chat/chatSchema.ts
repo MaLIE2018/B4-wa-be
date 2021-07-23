@@ -7,10 +7,14 @@ const MessageSchema = new Schema<Message>(
   {
     text: { type: String, required: true },
     userId: { type: mongoose.Types.ObjectId, ref: "User" },
-    hidden: [{ type: mongoose.Types.ObjectId, ref: "User" }],
+    status: {
+      type: String,
+      enum: ["received", "waiting"],
+      default: "received",
+    },
     content: [{ type: String }],
     type: { type: String, default: "text" },
-    date: { type: Date, default: new Date() },
+    date: { type: Date },
   },
   { strict: false }
 );

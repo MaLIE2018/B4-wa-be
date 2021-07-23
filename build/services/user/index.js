@@ -39,18 +39,21 @@ userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0,
 }));
 userRouter.post("/register", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newUser = yield new userSchema_1.default(req.body).save();
+        const newUser = new userSchema_1.default(req.body);
+        yield newUser.save();
         res.status(201).send(newUser);
     }
     catch (error) {
         if (error.name === "MongoError")
-            res.send({
-                error: error.keyValue,
-                reason: "Duplicated key",
-                advice: "Change the key value",
-            });
+            next(http_errors_1.default(400, {
+                message: {
+                    error: error.keyValue,
+                    reason: "Duplicated key",
+                    advice: "Change the key value",
+                },
+            }));
         else if (error.name === "ValidationError")
-            res.send(error.message);
+            next(http_errors_1.default(400, { message: "ValidationError" }));
         else
             next(http_errors_1.default(500, { message: error.message }));
     }

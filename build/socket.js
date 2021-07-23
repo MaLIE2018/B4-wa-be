@@ -19,7 +19,11 @@ const chatSchema_1 = __importDefault(require("./services/chat/chatSchema"));
 const { instrument } = require("@socket.io/admin-ui");
 const io = new socket_io_1.Server(app_1.default, {
     cors: {
-        origin: [process.env.FE_URL, "https://admin.socket.io/"],
+        origin: [
+            process.env.FE_URL,
+            process.env.FE_DEV_URL,
+            "https://admin.socket.io/",
+        ],
         methods: ["GET", "POST", "DELETE", "PUT"],
         allowedHeaders: ["my-custom-header"],
         credentials: true,
@@ -36,20 +40,26 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error);
         }
-        chats.forEach((chat) => {
-            socket.join(chat.chat._id);
-        });
-        chats.forEach((chat) => {
-            socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
-        });
+        if (chats.length > 0) {
+            chats.forEach((chat) => {
+                socket.join(chat.chat._id);
+            });
+            chats.forEach((chat) => {
+                socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+            });
+        }
     }));
     socket.on("participants-Join-room", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
+        const socketList = io.sockets.allSockets;
         participants.map((participant) => {
             const socketId = participant.profile.socketId;
-            io.of("/").adapter.on("join-room", (chatId, socketId) => {
-                console.log(`socket ${socketId} has joined room ${chatId}`);
-            });
+            if (Object.keys(socketList).includes(socketId)) {
+                io.of("/").adapter.on("join-room", (chatId, socketId) => {
+                    console.log(`socket ${socketId} has joined room ${chatId}`);
+                });
+            }
         });
+        socket.to(chatId).emit("new-chat", chatId);
     }));
     socket.on("join-room", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.join(chatId);
@@ -57,39 +67,27 @@ io.on("connection", (socket) => {
     socket.on("leave-room", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.leave(chatId);
     }));
-    socket.on("delete-message-for-me", (messageId, userId, chatId) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on("delete-message", (messageId, chatId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const message = chatSchema_1.default.findByIdAndUpdate(chatId, {
-                $push: { hidden: userId },
+            const message = yield chatSchema_1.default.findOneAndDelete({
+                _id: chatId,
+                "history._id": messageId,
             });
         }
         catch (error) {
             console.log(error);
         }
-        socket.emit("message-deleted");
-    }));
-    socket.on("delete-message-for-everybody", (messageId, participants, chatId) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const message = chatSchema_1.default.findByIdAndUpdate(messageId, {
-                hidden: participants.reduce((acc, val) => {
-                    acc.push(val._id);
-                    return acc;
-                }, []),
-            });
-        }
-        catch (error) {
-            console.log(error);
-        }
-        socket.to(chatId).emit("message-deleted-for-all", chatId);
+        socket.to(chatId).emit("message-deleted", messageId, chatId);
         socket.emit("message-deleted");
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
+        const newMessage = Object.assign(Object.assign({}, message), { status: "received" });
         yield chatSchema_1.default.findByIdAndUpdate(chatId, {
-            latestMessage: Object.assign(Object.assign({}, message), { date: new Date() }),
+            latestMessage: newMessage,
             $push: { history: message },
         }, { new: true, useFindAndModify: true });
         socket.to(chatId).emit("receive-message", message, chatId);
-        socket.emit("message-delivered", true);
+        socket.emit("message-delivered", newMessage.date, chatId);
     }));
     socket.on("im-typing", (chatId) => {
         socket.to(chatId).emit("is-typing", chatId);

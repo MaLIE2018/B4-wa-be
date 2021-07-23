@@ -10,6 +10,7 @@ exports.userInput4 = {
         lastName: "Liebsch1",
         email: "max4@max.com",
         online: false,
+        socketId: "",
     },
     password: "1234",
 };
@@ -19,6 +20,7 @@ exports.userInput1 = {
         lastName: "Liebsch1",
         email: "max1@max.com",
         online: false,
+        socketId: "",
     },
     password: "1234",
 };
@@ -28,6 +30,7 @@ exports.userInput2 = {
         lastName: "Liebsch2",
         email: "max@max.com2",
         online: false,
+        socketId: "",
     },
     password: "1234",
 };
@@ -37,6 +40,7 @@ exports.userInput3 = {
         lastName: "Liebsch3",
         email: "max3@max.com",
         online: false,
+        socketId: "",
     },
     password: "1234",
 };

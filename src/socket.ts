@@ -8,7 +8,11 @@ const { instrument } = require("@socket.io/admin-ui");
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.FE_URL!, "https://admin.socket.io/"],
+    origin: [
+      process.env.FE_URL!,
+      process.env.FE_DEV_URL!,
+      "https://admin.socket.io/",
+    ],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: ["my-custom-header"],
     credentials: true,
@@ -25,23 +29,29 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.log(error);
     }
-    chats.forEach((chat) => {
-      socket.join(chat.chat._id!);
-    });
-    chats.forEach((chat) => {
-      socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
-    });
+    if (chats.length > 0) {
+      chats.forEach((chat) => {
+        socket.join(chat.chat._id!);
+      });
+      chats.forEach((chat) => {
+        socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+      });
+    }
   });
 
   socket.on(
     "participants-Join-room",
     async (chatId, participants: Profile[]) => {
+      const socketList = io.sockets.allSockets;
       participants.map((participant) => {
         const socketId = participant.profile.socketId;
-        io.of("/").adapter.on("join-room", (chatId, socketId) => {
-          console.log(`socket ${socketId} has joined room ${chatId}`);
-        });
+        if (Object.keys(socketList).includes(socketId)) {
+          io.of("/").adapter.on("join-room", (chatId, socketId) => {
+            console.log(`socket ${socketId} has joined room ${chatId}`);
+          });
+        }
       });
+      socket.to(chatId).emit("new-chat", chatId);
     }
   );
 
@@ -53,46 +63,31 @@ io.on("connection", (socket) => {
     socket.leave(chatId);
   });
 
-  socket.on("delete-message-for-me", async (messageId, userId, chatId) => {
+  socket.on("delete-message", async (messageId, chatId) => {
     try {
-      const message = ChatModel.findByIdAndUpdate(chatId, {
-        $push: { hidden: userId },
+      const message = await ChatModel.findOneAndDelete({
+        _id: chatId,
+        "history._id": messageId,
       });
     } catch (error) {
       console.log(error);
     }
+    socket.to(chatId).emit("message-deleted", messageId, chatId);
     socket.emit("message-deleted");
   });
 
-  socket.on(
-    "delete-message-for-everybody",
-    async (messageId, participants, chatId) => {
-      try {
-        const message = ChatModel.findByIdAndUpdate(messageId, {
-          hidden: participants.reduce((acc: string[], val: any) => {
-            acc.push(val._id);
-            return acc;
-          }, []),
-        });
-      } catch (error) {
-        console.log(error);
-      }
-      socket.to(chatId).emit("message-deleted-for-all", chatId);
-      socket.emit("message-deleted");
-    }
-  );
-
   socket.on("send-message", async (message: Message, chatId: string) => {
+    const newMessage = { ...message, status: "received" };
     await ChatModel.findByIdAndUpdate(
       chatId,
       {
-        latestMessage: { ...message, date: new Date() },
+        latestMessage: newMessage,
         $push: { history: message },
       },
       { new: true, useFindAndModify: true }
     );
     socket.to(chatId).emit("receive-message", message, chatId);
-    socket.emit("message-delivered", true);
+    socket.emit("message-delivered", newMessage.date, chatId);
   });
 
   socket.on("im-typing", (chatId: string) => {

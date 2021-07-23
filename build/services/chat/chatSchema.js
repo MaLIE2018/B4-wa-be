@@ -9,10 +9,14 @@ const { model, Schema } = mongoose_1.default;
 const MessageSchema = new Schema({
     text: { type: String, required: true },
     userId: { type: mongoose_1.default.Types.ObjectId, ref: "User" },
-    hidden: [{ type: mongoose_1.default.Types.ObjectId, ref: "User" }],
+    status: {
+        type: String,
+        enum: ["received", "waiting"],
+        default: "received",
+    },
     content: [{ type: String }],
     type: { type: String, default: "text" },
-    date: { type: Date, default: new Date() },
+    date: { type: Date },
 }, { strict: false });
 exports.ChatSchema = new Schema({
     participants: [

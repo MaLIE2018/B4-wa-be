@@ -10,6 +10,7 @@ export const userInput4: Profile = {
     lastName: "Liebsch1",
     email: "max4@max.com",
     online: false,
+    socketId: "",
   },
   password: "1234",
 };
@@ -20,6 +21,7 @@ export let userInput1: Profile = {
     lastName: "Liebsch1",
     email: "max1@max.com",
     online: false,
+    socketId: "",
   },
   password: "1234",
 };
@@ -29,6 +31,8 @@ export let userInput2: Profile = {
     lastName: "Liebsch2",
     email: "max@max.com2",
     online: false,
+
+    socketId: "",
   },
   password: "1234",
 };
@@ -38,6 +42,7 @@ export let userInput3: Profile = {
     lastName: "Liebsch3",
     email: "max3@max.com",
     online: false,
+    socketId: "",
   },
   password: "1234",
 };
