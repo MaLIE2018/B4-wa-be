@@ -25,6 +25,7 @@ const corsOptions = {
             next(null, true);
         }
         else {
+            console.log("origin403:", origin);
             next(http_errors_1.default(403, { message: "Check your cors settings!" }));
         }
     },
