@@ -133,7 +133,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "test",
+    folder: "chat",
   },
 });
 
@@ -147,7 +147,7 @@ chatRouter.put(
     try {
       // req.user.profile.avatar = req.file.path;
       await req.user.save();
-      res.status(200).send("operation is done successfully");
+      res.status(200).send(req.file.path);
     } catch (error: any) {
       console.log(error);
       next(error);
