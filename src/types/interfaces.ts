@@ -50,6 +50,7 @@ export interface Message {
   type: string;
   date: Date;
   status: string;
+  image?: string;
   content?: string[];
 }
 
