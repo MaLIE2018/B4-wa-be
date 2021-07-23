@@ -40,7 +40,7 @@ chatRouter.post("/", async (req, res, next) => {
             await UserModel.findByIdAndUpdate(
               participantId,
               {
-                $push: { chats: { chat: chat._id } },
+                $push: { chats: { caht: chat._id } },
               },
               { useFindAndModify: false }
             )
@@ -147,7 +147,7 @@ chatRouter.put(
     try {
       // req.user.profile.avatar = req.file.path;
       await req.user.save();
-      res.status(200).send(req.file.path);
+      res.status(200).send({image: req.file.path });
     } catch (error: any) {
       console.log(error);
       next(error);
