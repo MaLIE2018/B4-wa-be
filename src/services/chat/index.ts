@@ -3,8 +3,8 @@ import { JWTMiddleWare } from "../../lib/auth/auth";
 import { ChatList } from "../../types/interfaces";
 import ChatModel from "../chat/chatSchema";
 import UserModel from "../user/userSchema";
-import {v2 as cloudinary} from "cloudinary"
-import { CloudinaryStorage } from "multer-storage-cloudinary"
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer = require("multer");
 
 const chatRouter = express.Router();
