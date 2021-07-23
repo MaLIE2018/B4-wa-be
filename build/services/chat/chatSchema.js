@@ -14,8 +14,9 @@ const MessageSchema = new Schema({
         enum: ["received", "waiting"],
         default: "received",
     },
+    image: { type: String },
     content: [{ type: String }],
-    type: { type: String, default: "text" },
+    type: { type: String, enum: ["text", "photo"], default: "text" },
     date: { type: Date },
 }, { strict: false });
 exports.ChatSchema = new Schema({
