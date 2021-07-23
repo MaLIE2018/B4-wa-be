@@ -26,7 +26,7 @@ chatRouter.post("/", async (req, res, next) => {
   try {
     const matchIt = await ChatModel.findOne({
       participants: [...req.body.participants, req.user._id],
-    });
+    }).populate("participants", { profile: 1 });
     if (matchIt === null) {
       const chat = new ChatModel({
         ...req.body,
@@ -46,7 +46,11 @@ chatRouter.post("/", async (req, res, next) => {
             )
         )
       );
-      res.status(200).send(chat);
+      const newChat = await ChatModel.findById(chat._id).populate(
+        "participants",
+        { profile: 1 }
+      );
+      res.status(200).send(newChat);
     } else {
       res.status(200).send(matchIt);
     }
