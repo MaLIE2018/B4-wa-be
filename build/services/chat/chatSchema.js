@@ -16,7 +16,7 @@ const MessageSchema = new Schema({
     },
     content: [{ type: String }],
     type: { type: String, default: "text" },
-    date: { type: Date, default: new Date() },
+    date: { type: Date },
 }, { strict: false });
 exports.ChatSchema = new Schema({
     participants: [

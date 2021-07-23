@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
         socket.emit("message-deleted");
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
-        const newMessage = Object.assign(Object.assign({}, message), { date: new Date(), status: "received" });
+        const newMessage = Object.assign(Object.assign({}, message), { status: "received" });
         yield chatSchema_1.default.findByIdAndUpdate(chatId, {
             latestMessage: newMessage,
             $push: { history: message },

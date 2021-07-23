@@ -48,6 +48,7 @@ export interface Message {
   text: string;
   userId: string;
   type: string;
+  date: Date;
   status: string;
   content?: string[];
 }

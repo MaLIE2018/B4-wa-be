@@ -77,7 +77,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-message", async (message: Message, chatId: string) => {
-    const newMessage = { ...message, date: new Date(), status: "received" };
+    const newMessage = { ...message, status: "received" };
     await ChatModel.findByIdAndUpdate(
       chatId,
       {
