@@ -70,16 +70,17 @@ io.on("connection", (socket) => {
         }
     }));
     socket.on("participants-Join-room", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
-        const socketList = io.sockets.allSockets;
+        const socketList = yield io.sockets.allSockets();
+        console.log("socketList:", socketList);
         participants.map((participant) => {
+            console.log(participant);
             const socketId = participant.profile.socketId;
-            if (Object.keys(socketList).includes(socketId)) {
-                io.of("/").adapter.on("join-room", (chatId, socketId) => {
-                    console.log(`socket ${socketId} has joined room ${chatId}`);
-                });
+            console.log("socketId:", socketId);
+            if ([...socketList].includes(socketId)) {
+                socket.to(socketId).emit("new-chat", chatId);
+                console.log();
             }
         });
-        socket.to(chatId).emit("new-chat", chatId);
     }));
     socket.on("join-room", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.join(chatId);

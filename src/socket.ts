@@ -62,16 +62,17 @@ io.on("connection", (socket) => {
   socket.on(
     "participants-Join-room",
     async (chatId, participants: Profile[]) => {
-      const socketList = io.sockets.allSockets;
+      const socketList = await io.sockets.allSockets();
+      console.log("socketList:", socketList);
       participants.map((participant) => {
+        console.log(participant);
         const socketId = participant.profile.socketId;
-        if (Object.keys(socketList).includes(socketId)) {
-          io.of("/").adapter.on("join-room", (chatId, socketId) => {
-            console.log(`socket ${socketId} has joined room ${chatId}`);
-          });
+        console.log("socketId:", socketId);
+        if ([...socketList].includes(socketId)) {
+          socket.to(socketId).emit("new-chat", chatId);
+          console.log();
         }
       });
-      socket.to(chatId).emit("new-chat", chatId);
     }
   );
 

@@ -19,7 +19,7 @@ const tools_1 = require("./tools");
 passport_1.default.use("google", new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_SECRET,
-    callbackURL: "http://localhost:3001/users/googleRedirect",
+    callbackURL: process.env.BE_URL + "/users/googleRedirect",
 }, (accessToken, refreshToken, profile, passportNext) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("profile:", profile);
