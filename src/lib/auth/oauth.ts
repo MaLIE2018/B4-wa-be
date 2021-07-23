@@ -18,7 +18,7 @@ passport.use(
       passportNext: any
     ) => {
       try {
-        // console.log("profile:", profile);
+        console.log("profile:", profile);
         const user = await UserModel.findOne({
           "profile.email": profile.emails[0].value,
         });

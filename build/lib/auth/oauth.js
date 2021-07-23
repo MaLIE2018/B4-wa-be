@@ -22,7 +22,7 @@ passport_1.default.use("google", new passport_google_oauth20_1.Strategy({
     callbackURL: "https://whatsappclone-mu.vercel.app/users/googleRedirect",
 }, (accessToken, refreshToken, profile, passportNext) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // console.log("profile:", profile);
+        console.log("profile:", profile);
         const user = yield userSchema_1.default.findOne({
             "profile.email": profile.emails[0].value,
         });
