@@ -29,6 +29,7 @@ const forbidden = (err, req, res, next) => {
         res.status(403).send(err.message);
     }
     else {
+        console.log(err);
         next(err);
     }
 };
