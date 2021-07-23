@@ -19,10 +19,10 @@ const tools_1 = require("./tools");
 passport_1.default.use("google", new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_SECRET,
-    callbackURL: process.env.BE_URL + "/users/googleRedirect",
+    callbackURL: process.env.FE_GOOGLE_REDIRECT_URL,
 }, (accessToken, refreshToken, profile, passportNext) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("profile:", profile);
+        // console.log("profile:", profile);
         const user = yield userSchema_1.default.findOne({
             "profile.email": profile.emails[0].value,
         });

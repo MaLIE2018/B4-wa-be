@@ -3,9 +3,9 @@ import { JWTMiddleWare } from "../../lib/auth/auth";
 import { ChatList } from "../../types/interfaces";
 import ChatModel from "../chat/chatSchema";
 import UserModel from "../user/userSchema";
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const multer = require("multer");
+import {v2 as cloudinary} from "cloudinary"
+import { CloudinaryStorage } from "multer-storage-cloudinary"
+import multer = require("multer");
 
 const chatRouter = express.Router();
 
@@ -149,13 +149,11 @@ chatRouter.put(
   upload,
   async (req: any, res: Response, next: NextFunction) => {
     try {
-      // req.user.profile.avatar = req.file.path;
       await req.user.save();
       res.status(200).send({ image: req.file.path });
     } catch (error: any) {
       console.log(error);
       next(error);
-      // next(createError(500, {message: error.message}));
     }
   }
 );

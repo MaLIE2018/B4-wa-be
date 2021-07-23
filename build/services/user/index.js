@@ -212,9 +212,11 @@ userRouter.get("/googleRedirect", oauth_1.default.authenticate("google"), (req, 
         res.cookie("refreshToken", req.user.tokens.refreshToken, {
             httpOnly: true,
         });
-        res.send("OK");
-        //   if (process.env.FE_URL !== undefined)
-        //     res.status(200).redirect(process.env.FE_URL);
+        // res.send("OK");
+        if (process.env.FE_URL !== undefined)
+            res.status(200).redirect(process.env.FE_URL_WHATSUP);
+        else
+            res.status(200).redirect("https://whatsappclone-mu.vercel.app/home");
     }
     catch (error) {
         next(error);

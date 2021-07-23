@@ -9,7 +9,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
-      callbackURL: process.env.BE_URL! + "/users/googleRedirect",
+      callbackURL: process.env.FE_GOOGLE_REDIRECT_URL!,
     },
     async (
       accessToken: any,
@@ -18,7 +18,7 @@ passport.use(
       passportNext: any
     ) => {
       try {
-        console.log("profile:", profile);
+        // console.log("profile:", profile);
         const user = await UserModel.findOne({
           "profile.email": profile.emails[0].value,
         });
