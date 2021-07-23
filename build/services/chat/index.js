@@ -16,8 +16,8 @@ const express_1 = __importDefault(require("express"));
 const auth_1 = require("../../lib/auth/auth");
 const chatSchema_1 = __importDefault(require("../chat/chatSchema"));
 const userSchema_1 = __importDefault(require("../user/userSchema"));
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary_1 = require("cloudinary");
+const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
 const multer = require("multer");
 const chatRouter = express_1.default.Router();
 //Get all my Chats
@@ -109,13 +109,13 @@ chatRouter.delete("/:id/participants/:participantId", (req, res, next) => __awai
         next(error);
     }
 }));
-cloudinary.config({
+cloudinary_1.v2.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.API_KEY,
     api_secret: process.env.API_SECTRET,
 });
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
+const storage = new multer_storage_cloudinary_1.CloudinaryStorage({
+    cloudinary: cloudinary_1.v2,
     params: {
         folder: "chat",
     },
@@ -123,14 +123,12 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage }).single("img");
 chatRouter.put("/upload", auth_1.JWTMiddleWare, upload, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // req.user.profile.avatar = req.file.path;
         yield req.user.save();
         res.status(200).send({ image: req.file.path });
     }
     catch (error) {
         console.log(error);
         next(error);
-        // next(createError(500, {message: error.message}));
     }
 }));
 exports.default = chatRouter;

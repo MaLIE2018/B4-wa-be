@@ -12,7 +12,13 @@ const services_1 = __importDefault(require("./services"));
 const passport_1 = __importDefault(require("passport"));
 const http_errors_1 = __importDefault(require("http-errors"));
 const app = express_1.default();
-const originsURLS = [process.env.FE_URL, process.env.FE_DEV_URL];
+const originsURLS = [
+    process.env.FE_URL,
+    process.env.FE_DEV_URL,
+    process.env.FE_GOOGLE_URL,
+    process.env.FE_GOOGLE_REDIRECT_URL,
+];
+// http://localhost:3001/users/googleRedirect
 const corsOptions = {
     origin: function (origin, next) {
         if (originsURLS.indexOf(origin) !== -1) {
