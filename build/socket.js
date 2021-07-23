@@ -31,6 +31,26 @@ const io = new socket_io_1.Server(app_1.default, {
     allowEIO3: true,
 });
 io.on("connection", (socket) => {
+    socket.on("connect", (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            yield userSchema_1.default.findByIdAndUpdate(userId, {
+                "profile.socketId": socket.id,
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }));
+    socket.on("give-me-my-socket-id", (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            yield userSchema_1.default.findByIdAndUpdate(userId, {
+                "profile.socketId": socket.id,
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }));
     socket.on("connect-chats", (userId, chats) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             yield userSchema_1.default.findByIdAndUpdate(userId, {

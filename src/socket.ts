@@ -21,6 +21,26 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
+  socket.on("connect", async (userId) => {
+    try {
+      await UserModel.findByIdAndUpdate(userId, {
+        "profile.socketId": socket.id,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  socket.on("give-me-my-socket-id", async (userId) => {
+    try {
+      await UserModel.findByIdAndUpdate(userId, {
+        "profile.socketId": socket.id,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   socket.on("connect-chats", async (userId, chats: ChatList[]) => {
     try {
       await UserModel.findByIdAndUpdate(userId, {
