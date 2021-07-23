@@ -34,16 +34,17 @@ chatRouter.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const matchIt = yield chatSchema_1.default.findOne({
             participants: [...req.body.participants, req.user._id],
-        });
+        }).populate("participants", { profile: 1 });
         if (matchIt === null) {
             const chat = new chatSchema_1.default(Object.assign(Object.assign({}, req.body), { participants: [...req.body.participants, req.user._id], owner: req.user._id }));
             yield chat.save();
             yield Promise.all(chat.participants.map((participantId) => __awaiter(void 0, void 0, void 0, function* () {
                 return yield userSchema_1.default.findByIdAndUpdate(participantId, {
-                    $push: { chats: { caht: chat._id } },
+                    $push: { chats: { chat: chat._id } },
                 }, { useFindAndModify: false });
             })));
-            res.status(200).send(chat);
+            const newChat = yield chatSchema_1.default.findById(chat._id).populate("participants", { profile: 1 });
+            res.status(200).send(newChat);
         }
         else {
             res.status(200).send(matchIt);

@@ -51,10 +51,14 @@ io.on("connection", (socket) => {
     }
     if (chats.length > 0) {
       chats.forEach((chat) => {
-        socket.join(chat.chat._id!);
+        if (chat.chat?._id) {
+          socket.join(chat.chat._id!);
+        }
       });
       chats.forEach((chat) => {
-        socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+        if (chat.chat?._id) {
+          socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+        }
       });
     }
   });
@@ -62,16 +66,13 @@ io.on("connection", (socket) => {
   socket.on(
     "participants-Join-room",
     async (chatId, participants: Profile[]) => {
-      const socketList = io.sockets.allSockets;
+      const socketList = await io.sockets.allSockets();
       participants.map((participant) => {
         const socketId = participant.profile.socketId;
-        if (Object.keys(socketList).includes(socketId)) {
-          io.of("/").adapter.on("join-room", (chatId, socketId) => {
-            console.log(`socket ${socketId} has joined room ${chatId}`);
-          });
+        if ([...socketList].includes(socketId)) {
+          socket.to(socketId).emit("new-chat", chatId);
         }
       });
-      socket.to(chatId).emit("new-chat", chatId);
     }
   );
 
@@ -102,11 +103,11 @@ io.on("connection", (socket) => {
       chatId,
       {
         latestMessage: newMessage,
-        $push: { history: message },
+        $push: { history: newMessage },
       },
       { new: true, useFindAndModify: true }
     );
-    socket.to(chatId).emit("receive-message", message, chatId);
+    socket.to(chatId).emit("receive-message", newMessage, chatId);
     socket.emit("message-delivered", newMessage.date, chatId);
   });
 

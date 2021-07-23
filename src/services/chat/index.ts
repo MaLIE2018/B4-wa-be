@@ -3,8 +3,8 @@ import { JWTMiddleWare } from "../../lib/auth/auth";
 import { ChatList } from "../../types/interfaces";
 import ChatModel from "../chat/chatSchema";
 import UserModel from "../user/userSchema";
-import {v2 as cloudinary} from "cloudinary"
-import { CloudinaryStorage } from "multer-storage-cloudinary"
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer = require("multer");
 
 const chatRouter = express.Router();
@@ -26,7 +26,7 @@ chatRouter.post("/", async (req, res, next) => {
   try {
     const matchIt = await ChatModel.findOne({
       participants: [...req.body.participants, req.user._id],
-    });
+    }).populate("participants", { profile: 1 });
     if (matchIt === null) {
       const chat = new ChatModel({
         ...req.body,
@@ -40,13 +40,17 @@ chatRouter.post("/", async (req, res, next) => {
             await UserModel.findByIdAndUpdate(
               participantId,
               {
-                $push: { chats: { caht: chat._id } },
+                $push: { chats: { chat: chat._id } },
               },
               { useFindAndModify: false }
             )
         )
       );
-      res.status(200).send(chat);
+      const newChat = await ChatModel.findById(chat._id).populate(
+        "participants",
+        { profile: 1 }
+      );
+      res.status(200).send(newChat);
     } else {
       res.status(200).send(matchIt);
     }
@@ -146,7 +150,7 @@ chatRouter.put(
   async (req: any, res: Response, next: NextFunction) => {
     try {
       await req.user.save();
-      res.status(200).send({image: req.file.path });
+      res.status(200).send({ image: req.file.path });
     } catch (error: any) {
       console.log(error);
       next(error);
