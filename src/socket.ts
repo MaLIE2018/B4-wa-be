@@ -12,6 +12,8 @@ const io = new Server(server, {
       process.env.FE_URL!,
       process.env.FE_DEV_URL!,
       "https://admin.socket.io/",
+      process.env.FE_GOOGLE_URL!,
+      process.env.FE_GOOGLE_REDIRECT_URL!,
     ],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: ["my-custom-header"],

@@ -23,6 +23,8 @@ const io = new socket_io_1.Server(app_1.default, {
             process.env.FE_URL,
             process.env.FE_DEV_URL,
             "https://admin.socket.io/",
+            process.env.FE_GOOGLE_URL,
+            process.env.FE_GOOGLE_REDIRECT_URL,
         ],
         methods: ["GET", "POST", "DELETE", "PUT"],
         allowedHeaders: ["my-custom-header"],
