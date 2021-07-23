@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
       console.log(error);
     }
     socket.to(chatId).emit("message-deleted", messageId, chatId);
-    socket.emit("message-deleted");
+    socket.emit("message-deleted", messageId, chatId);
   });
 
   socket.on("send-message", async (message: Message, chatId: string) => {
