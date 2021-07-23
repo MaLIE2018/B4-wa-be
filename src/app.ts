@@ -13,9 +13,8 @@ const originsURLS = [
 	process.env.FE_URL,
 	process.env.FE_DEV_URL,
 	process.env.FE_GOOGLE_URL,
-	process.env.FE_GOOGLE_REDIRECT_URL,
-];
-// http://localhost:3001/users/googleRedirect
+  process.env.FE_GOOGLE_REDIRECT_URL,
+]
 const corsOptions = {
   origin: function (origin: any, next: any) {
     if (originsURLS.indexOf(origin) !== -1) {
