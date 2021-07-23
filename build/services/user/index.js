@@ -206,12 +206,8 @@ userRouter.post("/me/friends/:userId", auth_1.JWTMiddleWare, (req, res, next) =>
 userRouter.get("/googlelogin", oauth_1.default.authenticate("google", { scope: ["profile", "email"] }));
 userRouter.get("/googleRedirect", oauth_1.default.authenticate("google"), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        res.cookie("accessToken", req.user.tokens.accessToken, {
-            httpOnly: true,
-        });
-        res.cookie("refreshToken", req.user.tokens.refreshToken, {
-            httpOnly: true,
-        });
+        res.cookie("access_token", req.user.tokens.accessToken, cookieOptions);
+        res.cookie("refresh_token", req.user.tokens.refreshToken, cookieOptions);
         // res.send("OK");
         if (process.env.FE_URL !== undefined)
             res.status(200).redirect(process.env.FE_URL_WHATSUP);

@@ -255,16 +255,12 @@ userRouter.get(
   passport.authenticate("google"),
   async (req, res, next) => {
     try {
-      res.cookie("accessToken", req.user.tokens.accessToken, {
-        httpOnly: true,
-      });
-      res.cookie("refreshToken", req.user.tokens.refreshToken, {
-        httpOnly: true,
-      });
+      res.cookie("access_token", req.user.tokens.accessToken, cookieOptions);
+      res.cookie("refresh_token", req.user.tokens.refreshToken, cookieOptions);
       // res.send("OK");
-      if (process.env.FE_URL !== undefined) res.status(200).redirect(process.env.FE_URL_WHATSUP!);
+      if (process.env.FE_URL !== undefined)
+        res.status(200).redirect(process.env.FE_URL_WHATSUP!);
       else res.status(200).redirect("https://whatsappclone-mu.vercel.app/home");
-      
     } catch (error) {
       next(error);
     }
