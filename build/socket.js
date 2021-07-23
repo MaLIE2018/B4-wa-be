@@ -71,14 +71,10 @@ io.on("connection", (socket) => {
     }));
     socket.on("participants-Join-room", (chatId, participants) => __awaiter(void 0, void 0, void 0, function* () {
         const socketList = yield io.sockets.allSockets();
-        console.log("socketList:", socketList);
         participants.map((participant) => {
-            console.log(participant);
             const socketId = participant.profile.socketId;
-            console.log("socketId:", socketId);
             if ([...socketList].includes(socketId)) {
                 socket.to(socketId).emit("new-chat", chatId);
-                console.log();
             }
         });
     }));

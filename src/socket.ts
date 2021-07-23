@@ -63,14 +63,10 @@ io.on("connection", (socket) => {
     "participants-Join-room",
     async (chatId, participants: Profile[]) => {
       const socketList = await io.sockets.allSockets();
-      console.log("socketList:", socketList);
       participants.map((participant) => {
-        console.log(participant);
         const socketId = participant.profile.socketId;
-        console.log("socketId:", socketId);
         if ([...socketList].includes(socketId)) {
           socket.to(socketId).emit("new-chat", chatId);
-          console.log();
         }
       });
     }
