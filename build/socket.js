@@ -62,12 +62,14 @@ io.on("connection", (socket) => {
         }
         if (chats.length > 0) {
             chats.forEach((chat) => {
-                if (chat.chat._id) {
+                var _a;
+                if ((_a = chat.chat) === null || _a === void 0 ? void 0 : _a._id) {
                     socket.join(chat.chat._id);
                 }
             });
             chats.forEach((chat) => {
-                if (chat.chat._id) {
+                var _a;
+                if ((_a = chat.chat) === null || _a === void 0 ? void 0 : _a._id) {
                     socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
                 }
             });

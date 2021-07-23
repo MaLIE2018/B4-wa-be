@@ -51,12 +51,12 @@ io.on("connection", (socket) => {
     }
     if (chats.length > 0) {
       chats.forEach((chat) => {
-        if (chat.chat._id) {
+        if (chat.chat?._id) {
           socket.join(chat.chat._id!);
         }
       });
       chats.forEach((chat) => {
-        if (chat.chat._id) {
+        if (chat.chat?._id) {
           socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
         }
       });
