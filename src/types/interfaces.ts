@@ -14,7 +14,7 @@ export interface Profile {
     email: string;
     avatar?: string;
     googleId?: string;
-    socketId?: string;
+    socketId: string;
     online: boolean;
     lastSeen?: Date;
   };
@@ -48,7 +48,7 @@ export interface Message {
   text: string;
   userId: string;
   type: string;
-  hidden?: string[];
+  status: string;
   content?: string[];
 }
 
