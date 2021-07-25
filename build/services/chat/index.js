@@ -71,7 +71,8 @@ chatRouter.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 chatRouter.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         req.user.chats = req.user.chats.map((c) => {
-            if (c.chat.toString() === req.params.id.toString()) {
+            console.log("c:", c.chat._id);
+            if (c.chat._id.toString() === req.params.id.toString()) {
                 c.hidden = true;
                 return c;
             }

@@ -31,6 +31,7 @@ const JWTMiddleWare = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                 .populate({
                 path: "chats.chat",
                 select: { participants: 1, latestMessage: 1 },
+                match: { hidden: false },
                 populate: {
                     path: "participants",
                     select: "profile",

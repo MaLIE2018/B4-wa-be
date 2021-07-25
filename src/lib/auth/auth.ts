@@ -18,6 +18,7 @@ export const JWTMiddleWare: Middleware = async (req, res, next) => {
         .populate({
           path: "chats.chat",
           select: { participants: 1, latestMessage: 1 },
+          match: { hidden: false },
           populate: {
             path: "participants",
             select: "profile",
