@@ -25,7 +25,7 @@ export interface User extends Profile {
   _id?: string;
   password?: string;
   friends?: User[];
-  chats: { hidden: boolean; chatId: string }[];
+  chats: Chat[];
   refreshToken?: string;
   save: Function;
 }
@@ -69,4 +69,19 @@ export interface ChatList {
 export interface plainChatList {
   hidden: boolean;
   chat: string;
+}
+
+export interface Participant {
+  profile: {
+    username?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    avatar?: string;
+    googleId?: string;
+    socketId: string;
+    online: boolean;
+    lastSeen?: Date;
+  };
+  _id: string;
 }

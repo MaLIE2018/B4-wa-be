@@ -40,7 +40,7 @@ chatRouter.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             yield chat.save();
             yield Promise.all(chat.participants.map((participantId) => __awaiter(void 0, void 0, void 0, function* () {
                 return yield userSchema_1.default.findByIdAndUpdate(participantId, {
-                    $push: { chats: { chat: chat._id } },
+                    $push: { chats: chat._id },
                 }, { useFindAndModify: false });
             })));
             const newChat = yield chatSchema_1.default.findById(chat._id).populate("participants", { profile: 1 });
@@ -70,16 +70,19 @@ chatRouter.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 //Delete Chat
 chatRouter.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        req.user.chats = req.user.chats.map((c) => {
-            console.log("c:", c.chat._id);
-            if (c.chat._id.toString() === req.params.id.toString()) {
-                c.hidden = true;
-                return c;
-            }
-            return c;
-        });
-        req.user.save();
-        res.status(204).send();
+        const chat = yield chatSchema_1.default.findByIdAndDelete(req.params.id, {});
+        console.log("chat:", chat);
+        if (chat) {
+            yield Promise.all(chat.participants.map((participantId) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield userSchema_1.default.findByIdAndUpdate(participantId, {
+                    $pull: { chats: chat._id },
+                }, { useFindAndModify: false });
+            })));
+            res.status(204).send();
+        }
+        else {
+            res.status(404).send({ message: "Not Found" });
+        }
     }
     catch (error) {
         next(error);

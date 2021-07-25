@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyAccessToken = exports.verifyRefreshToken = exports.JWTAuthenticate = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const generateAccessToken = (payload) => new Promise((resolve, reject) => jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET, { expiresIn: "10 min" }, (err, token) => {
+const generateAccessToken = (payload) => new Promise((resolve, reject) => jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 }, (err, token) => {
     if (err)
         reject(err);
     resolve(token);

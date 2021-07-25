@@ -12,7 +12,7 @@ const MessageSchema = new Schema<Message>(
       enum: ["received", "waiting"],
       default: "received",
     },
-    image:{type:String},
+    image: { type: String },
     content: [{ type: String }],
     type: { type: String, enum: ["text", "photo"], default: "text" },
     date: { type: Date },

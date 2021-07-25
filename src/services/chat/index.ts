@@ -1,6 +1,6 @@
 import express, { NextFunction, Response } from "express";
 import { JWTMiddleWare } from "../../lib/auth/auth";
-import { ChatList } from "../../types/interfaces";
+import { ChatList, Participant, Profile, User } from "../../types/interfaces";
 import ChatModel from "../chat/chatSchema";
 import UserModel from "../user/userSchema";
 import { v2 as cloudinary } from "cloudinary";
@@ -40,7 +40,7 @@ chatRouter.post("/", async (req, res, next) => {
             await UserModel.findByIdAndUpdate(
               participantId,
               {
-                $push: { chats: { chat: chat._id } },
+                $push: { chats: chat._id },
               },
               { useFindAndModify: false }
             )
@@ -73,16 +73,25 @@ chatRouter.get("/:id", async (req, res, next) => {
 //Delete Chat
 chatRouter.delete("/:id", async (req, res, next) => {
   try {
-    req.user.chats = req.user.chats.map((c: ChatList) => {
-      console.log("c:", c.chat._id);
-      if (c.chat._id.toString() === req.params.id.toString()) {
-        c.hidden = true;
-        return c;
-      }
-      return c;
-    });
-    req.user.save();
-    res.status(204).send();
+    const chat = await ChatModel.findByIdAndDelete(req.params.id, {});
+    console.log("chat:", chat);
+    if (chat) {
+      await Promise.all(
+        chat.participants.map(
+          async (participantId: string) =>
+            await UserModel.findByIdAndUpdate(
+              participantId,
+              {
+                $pull: { chats: chat._id },
+              },
+              { useFindAndModify: false }
+            )
+        )
+      );
+      res.status(204).send();
+    } else {
+      res.status(404).send({ message: "Not Found" });
+    }
   } catch (error) {
     next(error);
   }

@@ -15,10 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const { model, Schema } = mongoose_1.default;
-const ChatsReferenceSchema = new Schema({
-    chat: { type: Schema.Types.ObjectId, ref: "Chat" },
-    hidden: { type: Boolean, default: false },
-}, { _id: false });
 const UserSchema = new Schema({
     profile: {
         username: { type: String },
@@ -37,7 +33,7 @@ const UserSchema = new Schema({
     password: { type: String },
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
     refreshToken: { type: String },
-    chats: [ChatsReferenceSchema],
+    chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
 }, { timestamps: true, strict: false });
 UserSchema.methods.toJSON = function () {
     const user = this;
@@ -58,22 +54,20 @@ UserSchema.pre("save", function () {
 UserSchema.static("checkCredentials", function checkCredentials(email, password) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = yield this.findOne({ "profile.email": email })
-            .populate("friends", {
-            profile: 1,
-        })
             .populate({
-            path: "chats.chat",
+            path: "chats",
             select: { participants: 1, latestMessage: 1 },
             populate: {
                 path: "participants",
                 select: "profile",
             },
+        })
+            .populate("friends", {
+            profile: 1,
         });
         if (user) {
             const isMatch = yield bcrypt_1.default.compare(password, user.password);
             if (isMatch) {
-                user.chats = user.chats.filter((c) => c.hidden === false);
-                yield user.save();
                 return user;
             }
             else {
