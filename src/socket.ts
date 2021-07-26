@@ -77,6 +77,9 @@ io.on("connection", (socket) => {
       });
     }
   );
+  socket.on("room-deleted", async (chatId) => {
+    socket.to(chatId).emit("deleted-chat");
+  });
 
   socket.on("join-room", async (chatId) => {
     socket.join(chatId);

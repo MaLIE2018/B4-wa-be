@@ -84,6 +84,9 @@ io.on("connection", (socket) => {
             }
         });
     }));
+    socket.on("room-deleted", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
+        socket.to(chatId).emit("deleted-chat");
+    }));
     socket.on("join-room", (chatId) => __awaiter(void 0, void 0, void 0, function* () {
         socket.join(chatId);
     }));

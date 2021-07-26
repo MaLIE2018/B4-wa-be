@@ -39,7 +39,7 @@ userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0,
 }));
 userRouter.post("/register", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newUser = new userSchema_1.default(req.body);
+        const newUser = new userSchema_1.default(Object.assign(Object.assign({}, req.body), { profile: Object.assign(Object.assign({}, req.body.profile), { email: req.body.profile.email.toLowerCase() }) }));
         yield newUser.save();
         res.status(201).send(newUser);
     }

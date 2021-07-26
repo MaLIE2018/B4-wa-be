@@ -34,7 +34,13 @@ userRouter.post(
   "/register",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const newUser = new UserModel(req.body);
+      const newUser = new UserModel({
+        ...req.body,
+        profile: {
+          ...req.body.profile,
+          email: req.body.profile.email.toLowerCase(),
+        },
+      });
       await newUser.save();
       res.status(201).send(newUser);
     } catch (error: any) {
