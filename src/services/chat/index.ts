@@ -13,7 +13,7 @@ chatRouter.get("/me", async (req, res, next) => {
   try {
     const chats = await ChatModel.find(
       { participants: req.user._id },
-      { history: 0 }
+      { history: 0, name: 1 }
     ).populate("participants", { profile: 1 });
     res.status(200).send(chats);
   } catch (error) {

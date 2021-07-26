@@ -56,7 +56,7 @@ UserSchema.static("checkCredentials", function checkCredentials(email, password)
         const user = yield this.findOne({ "profile.email": email })
             .populate({
             path: "chats",
-            select: { participants: 1, latestMessage: 1 },
+            select: { participants: 1, latestMessage: 1, name: 1 },
             populate: {
                 path: "participants",
                 select: "profile",

@@ -30,7 +30,7 @@ const JWTMiddleWare = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             })
                 .populate({
                 path: "chats",
-                select: { participants: 1, latestMessage: 1 },
+                select: { participants: 1, latestMessage: 1, name: 1 },
                 populate: {
                     path: "participants",
                     select: "profile",
