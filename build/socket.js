@@ -98,18 +98,17 @@ io.on("connection", (socket) => {
             const message = yield chatSchema_1.default.findByIdAndUpdate(chatId, {
                 $pull: { history: { _id: messageId } },
             }, { useFindAndModify: false });
+            socket.to(chatId).emit("message-deleted", messageId, chatId);
+            socket.emit("message-deleted", messageId, chatId);
         }
         catch (error) {
             console.log(error);
         }
-        socket.to(chatId).emit("message-deleted", messageId, chatId);
-        socket.emit("message-deleted", messageId, chatId);
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
-        const newMessage = Object.assign(Object.assign({}, message), { status: "received" });
-        yield chatSchema_1.default.findByIdAndUpdate(chatId, {
-            latestMessage: newMessage,
-            $push: { history: newMessage },
+        const newMessage = yield chatSchema_1.default.findByIdAndUpdate(chatId, {
+            latestMessage: Object.assign(Object.assign({}, message), { status: "received" }),
+            $push: { history: Object.assign(Object.assign({}, message), { status: "received" }) },
         }, { new: true, useFindAndModify: false });
         socket.to(chatId).emit("receive-message", newMessage, chatId);
         socket.emit("message-delivered", newMessage.date, chatId);

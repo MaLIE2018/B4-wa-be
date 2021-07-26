@@ -98,20 +98,19 @@ io.on("connection", (socket) => {
         },
         { useFindAndModify: false }
       );
+      socket.to(chatId).emit("message-deleted", messageId, chatId);
+      socket.emit("message-deleted", messageId, chatId);
     } catch (error) {
       console.log(error);
     }
-    socket.to(chatId).emit("message-deleted", messageId, chatId);
-    socket.emit("message-deleted", messageId, chatId);
   });
 
   socket.on("send-message", async (message: Message, chatId: string) => {
-    const newMessage = { ...message, status: "received" };
-    await ChatModel.findByIdAndUpdate(
+    const newMessage = await ChatModel.findByIdAndUpdate(
       chatId,
       {
-        latestMessage: newMessage,
-        $push: { history: newMessage },
+        latestMessage: { ...message, status: "received" },
+        $push: { history: { ...message, status: "received" } },
       },
       { new: true, useFindAndModify: false }
     );
