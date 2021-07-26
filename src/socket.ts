@@ -1,7 +1,7 @@
 import server from "./app";
 import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
-import { ChatList, Message, Profile } from "./types/interfaces";
+import { Chat, Message, Profile } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
 import { SocketAddress } from "node:net";
 const { instrument } = require("@socket.io/admin-ui");
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("connect-chats", async (userId, chats: ChatList[]) => {
+  socket.on("connect-chats", async (userId, chats: Chat[]) => {
     try {
       await UserModel.findByIdAndUpdate(userId, {
         "profile.socketId": socket.id,
@@ -53,13 +53,13 @@ io.on("connection", (socket) => {
     }
     if (chats.length > 0) {
       chats.forEach((chat) => {
-        if (chat.chat?._id) {
-          socket.join(chat.chat._id!);
+        if (chat?._id) {
+          socket.join(chat._id!);
         }
       });
       chats.forEach((chat) => {
-        if (chat.chat?._id) {
-          socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+        if (chat?._id) {
+          socket.to(chat._id).emit("logged-in", chat._id);
         }
       });
     }
@@ -88,10 +88,13 @@ io.on("connection", (socket) => {
 
   socket.on("delete-message", async (messageId, chatId) => {
     try {
-      const message = await ChatModel.findOneAndDelete({
-        _id: chatId,
-        "history._id": messageId,
-      });
+      const message = await ChatModel.findByIdAndUpdate(
+        chatId,
+        {
+          $pull: { history: { _id: messageId } },
+        },
+        { useFindAndModify: false }
+      );
     } catch (error) {
       console.log(error);
     }
@@ -107,7 +110,7 @@ io.on("connection", (socket) => {
         latestMessage: newMessage,
         $push: { history: newMessage },
       },
-      { new: true, useFindAndModify: true }
+      { new: true, useFindAndModify: false }
     );
     socket.to(chatId).emit("receive-message", newMessage, chatId);
     socket.emit("message-delivered", newMessage.date, chatId);

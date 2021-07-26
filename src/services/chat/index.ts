@@ -1,6 +1,5 @@
 import express, { NextFunction, Response } from "express";
 import { JWTMiddleWare } from "../../lib/auth/auth";
-import { ChatList, Participant, Profile, User } from "../../types/interfaces";
 import ChatModel from "../chat/chatSchema";
 import UserModel from "../user/userSchema";
 import { v2 as cloudinary } from "cloudinary";

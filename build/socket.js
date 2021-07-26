@@ -64,15 +64,13 @@ io.on("connection", (socket) => {
         }
         if (chats.length > 0) {
             chats.forEach((chat) => {
-                var _a;
-                if ((_a = chat.chat) === null || _a === void 0 ? void 0 : _a._id) {
-                    socket.join(chat.chat._id);
+                if (chat === null || chat === void 0 ? void 0 : chat._id) {
+                    socket.join(chat._id);
                 }
             });
             chats.forEach((chat) => {
-                var _a;
-                if ((_a = chat.chat) === null || _a === void 0 ? void 0 : _a._id) {
-                    socket.to(chat.chat._id).emit("logged-in", chat.chat._id);
+                if (chat === null || chat === void 0 ? void 0 : chat._id) {
+                    socket.to(chat._id).emit("logged-in", chat._id);
                 }
             });
         }
@@ -94,10 +92,9 @@ io.on("connection", (socket) => {
     }));
     socket.on("delete-message", (messageId, chatId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const message = yield chatSchema_1.default.findOneAndDelete({
-                _id: chatId,
-                "history._id": messageId,
-            });
+            const message = yield chatSchema_1.default.findByIdAndUpdate(chatId, {
+                $pull: { history: { _id: messageId } },
+            }, { useFindAndModify: false });
         }
         catch (error) {
             console.log(error);
@@ -110,7 +107,7 @@ io.on("connection", (socket) => {
         yield chatSchema_1.default.findByIdAndUpdate(chatId, {
             latestMessage: newMessage,
             $push: { history: newMessage },
-        }, { new: true, useFindAndModify: true });
+        }, { new: true, useFindAndModify: false });
         socket.to(chatId).emit("receive-message", newMessage, chatId);
         socket.emit("message-delivered", newMessage.date, chatId);
     }));

@@ -62,10 +62,6 @@ export interface Chat {
   _id?: string;
 }
 
-export interface ChatList {
-  hidden: boolean;
-  chat: { _id: string };
-}
 export interface plainChatList {
   hidden: boolean;
   chat: string;
