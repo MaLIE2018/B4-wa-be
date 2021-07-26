@@ -25,7 +25,7 @@ export const ChatSchema = new Schema<Chat>({
     { type: mongoose.Types.ObjectId, ref: "User", required: true },
   ],
   owner: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-  name: { type: String },
+  name: { type: String, default: "" },
   latestMessage: { type: Object, default: "" },
   history: [MessageSchema],
 });

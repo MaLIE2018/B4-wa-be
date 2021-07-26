@@ -24,7 +24,7 @@ exports.ChatSchema = new Schema({
         { type: mongoose_1.default.Types.ObjectId, ref: "User", required: true },
     ],
     owner: { type: mongoose_1.default.Types.ObjectId, ref: "User", required: true },
-    name: { type: String },
+    name: { type: String, default: "" },
     latestMessage: { type: Object, default: "" },
     history: [MessageSchema],
 });
