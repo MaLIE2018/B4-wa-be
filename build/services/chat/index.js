@@ -23,7 +23,7 @@ const chatRouter = express_1.default.Router();
 //Get all my Chats
 chatRouter.get("/me", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const chats = yield chatSchema_1.default.find({ participants: req.user._id }, { history: 0, name: 1 }).populate("participants", { profile: 1 });
+        const chats = yield chatSchema_1.default.find({ participants: req.user._id }, { history: 0 }).populate("participants", { profile: 1 });
         res.status(200).send(chats);
     }
     catch (error) {
@@ -71,7 +71,6 @@ chatRouter.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 chatRouter.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chat = yield chatSchema_1.default.findByIdAndDelete(req.params.id, {});
-        console.log("chat:", chat);
         if (chat) {
             yield Promise.all(chat.participants.map((participantId) => __awaiter(void 0, void 0, void 0, function* () {
                 return yield userSchema_1.default.findByIdAndUpdate(participantId, {

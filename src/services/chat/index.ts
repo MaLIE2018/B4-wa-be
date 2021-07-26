@@ -13,7 +13,7 @@ chatRouter.get("/me", async (req, res, next) => {
   try {
     const chats = await ChatModel.find(
       { participants: req.user._id },
-      { history: 0, name: 1 }
+      { history: 0 }
     ).populate("participants", { profile: 1 });
     res.status(200).send(chats);
   } catch (error) {
@@ -73,7 +73,6 @@ chatRouter.get("/:id", async (req, res, next) => {
 chatRouter.delete("/:id", async (req, res, next) => {
   try {
     const chat = await ChatModel.findByIdAndDelete(req.params.id, {});
-    console.log("chat:", chat);
     if (chat) {
       await Promise.all(
         chat.participants.map(
