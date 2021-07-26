@@ -26,7 +26,7 @@ userRouter.get("/finduser/:query", (req, res, next) => __awaiter(void 0, void 0,
     try {
         console.log("req.params.query:", req.params.query);
         const users = yield userSchema_1.default.find({
-            "profile.firstName": { $regex: `${req.params.query}` },
+            "profile.firstName": { $regex: `${req.params.query}`, $options: "i" },
         });
         if (users)
             res.status(200).send(users);

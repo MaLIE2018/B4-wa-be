@@ -21,7 +21,7 @@ userRouter.get("/finduser/:query", async (req, res, next) => {
   try {
     console.log("req.params.query:", req.params.query);
     const users = await UserModel.find({
-      "profile.firstName": { $regex: `${req.params.query}` },
+      "profile.firstName": { $regex: `${req.params.query}`, $options: "i" },
     });
     if (users) res.status(200).send(users);
     else res.status(204).send(users);
