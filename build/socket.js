@@ -106,12 +106,19 @@ io.on("connection", (socket) => {
         }
     }));
     socket.on("send-message", (message, chatId) => __awaiter(void 0, void 0, void 0, function* () {
-        const newMessage = yield chatSchema_1.default.findByIdAndUpdate(chatId, {
-            latestMessage: Object.assign(Object.assign({}, message), { status: "received" }),
-            $push: { history: Object.assign(Object.assign({}, message), { status: "received" }) },
-        }, { new: true, useFindAndModify: false });
-        socket.to(chatId).emit("receive-message", newMessage, chatId);
-        socket.emit("message-delivered", newMessage.date, chatId);
+        try {
+            const newMessage = yield chatSchema_1.default.findByIdAndUpdate(chatId, {
+                latestMessage: Object.assign(Object.assign({}, message), { status: "received" }),
+                $push: { history: Object.assign(Object.assign({}, message), { status: "received" }) },
+            }, { new: true, useFindAndModify: false });
+            socket
+                .to(chatId)
+                .emit("receive-message", newMessage.latestMessage, chatId);
+            socket.emit("message-delivered", newMessage.latestMessage.date, chatId);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }));
     socket.on("im-typing", (chatId) => {
         socket.to(chatId).emit("is-typing", chatId);

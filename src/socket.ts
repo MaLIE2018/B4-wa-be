@@ -106,16 +106,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-message", async (message: Message, chatId: string) => {
-    const newMessage = await ChatModel.findByIdAndUpdate(
-      chatId,
-      {
-        latestMessage: { ...message, status: "received" },
-        $push: { history: { ...message, status: "received" } },
-      },
-      { new: true, useFindAndModify: false }
-    );
-    socket.to(chatId).emit("receive-message", newMessage, chatId);
-    socket.emit("message-delivered", newMessage.date, chatId);
+    try {
+      const newMessage = await ChatModel.findByIdAndUpdate(
+        chatId,
+        {
+          latestMessage: { ...message, status: "received" },
+          $push: { history: { ...message, status: "received" } },
+        },
+        { new: true, useFindAndModify: false }
+      );
+      socket
+        .to(chatId)
+        .emit("receive-message", newMessage.latestMessage, chatId);
+      socket.emit("message-delivered", newMessage.latestMessage.date, chatId);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   socket.on("im-typing", (chatId: string) => {
