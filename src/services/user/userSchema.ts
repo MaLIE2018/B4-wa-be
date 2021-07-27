@@ -15,7 +15,7 @@ const UserSchema = new Schema<User, UserModel>(
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
       socketId: { type: String, default: "" },
-      lastSeen: { type: Date },
+      lastSeen: { type: Date, default: new Date() },
       email: {
         type: String,
         required: true,
