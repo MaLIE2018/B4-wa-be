@@ -4,20 +4,8 @@ import UserModel from "./services/user/userSchema";
 import { Chat, Message, Profile } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
 
-const io = new Server(server, {
-  cors: {
-    origin: [
-      process.env.FE_URL!,
-      process.env.FE_DEV_URL!,
-      process.env.FE_GOOGLE_URL!,
-      process.env.FE_GOOGLE_REDIRECT_URL!,
-    ],
-    methods: ["GET", "POST", "DELETE", "PUT"],
-    allowedHeaders: ["my-custom-header"],
-    credentials: true,
-  },
-  allowEIO3: true,
-});
+
+const io = new Server(server);
 
 io.on("connection", (socket) => {
   socket.on("connect", async (userId) => {
