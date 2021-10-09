@@ -150,7 +150,12 @@ userRouter.delete(
 const cookieOptions: CookieOptions =
   process.env.NODE_ENV === "development"
     ? { httpOnly: true }
-    : { httpOnly: true, sameSite: "none", secure: true };
+    : {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        expires: new Date(Date.now() + 900000),
+      };
 
 userRouter.get(
   "/login",

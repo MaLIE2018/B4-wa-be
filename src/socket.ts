@@ -3,7 +3,6 @@ import { Server } from "socket.io";
 import UserModel from "./services/user/userSchema";
 import { Chat, Message, Profile } from "./types/interfaces";
 import ChatModel from "./services/chat/chatSchema";
-import { SocketAddress } from "node:net";
 const { instrument } = require("@socket.io/admin-ui");
 
 const io = new Server(server, {
